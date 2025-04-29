@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}ফাইল ব্রাউজার{% endblock %} {# Title changed slightly #}
+{% block title %}হোম - ফাইল সার্ভার{% endblock %}
 
 {% block content %}
-    {# আপলোড এবং ফোল্ডার তৈরির সেকশন আগের মতোই রাখা হলো, প্রয়োজন অনুযায়ী রাখতে বা বাদ দিতে পারেন #}
+    {# আপলোড এবং ফোল্ডার তৈরির সেকশন #}
     <div class="row mb-4">
         <div class="col-md-6 mb-3 mb-md-0">
              <div class="p-3 border rounded bg-light shadow-sm h-100">
@@ -41,181 +41,154 @@
     </div>
     <hr class="mb-4">
 
-    {# --- ফাইল ও ফোল্ডারের একত্রিত লিস্ট --- #}
-    {% if items %}
-        <div class="list-group mb-4 shadow-sm file-manager-list"> {# Added a class for potential specific styling #}
-            {% for item in items %}
-                {# Determine if it's a directory or file #}
-                {% if item.is_directory %}
-                    {# --- ফোল্ডার আইটেম --- #}
-                    <a href="{{ url_for('view_folder', folder_id=item.id) }}" class="list-group-item list-group-item-action">
-                         <span class="file-icon"><i class="fas fa-folder text-warning"></i></span> {# Folder icon #}
-                         <div class="file-details justify-content-start">
-                             <span class="file-name font-weight-bold">{{ item.name }}</span> {# Bold folder names #}
-                         </div>
-                         <div class="file-actions ml-2">
-                             {# ফোল্ডারের জন্য আলাদা ড্রপডাউন বা বাটন যোগ করা যেতে পারে #}
-                             {# Example:
-                             <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" ... >
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                     <a class="dropdown-item" href="#">Rename</a>
-                                     <a class="dropdown-item text-danger" href="#">Delete</a>
-                                </div>
-                              </div>
-                              #}
-                         </div>
-                    </a>
-                {% else %}
-                    {# --- ফাইল আইটেম --- #}
-                    <div class="list-group-item px-0 px-md-2"> {# Use div instead of <a> for non-clickable item background #}
-                        {# --- ইন্টেলিজেন্ট আইকন লজিক --- #}
-                        {% set icon_class = 'fa-file-alt' %} {# Default file icon #}
-                        {% set icon_color = '' %} {# Default color #}
+    {# ফোল্ডার লিস্ট #}
+    <h4 class="text-primary mb-3"><i class="fas fa-folder mr-2"></i> আপনার ফোল্ডারসমূহ</h4>
+    {% if folders %}
+        <div class="list-group mb-4 shadow-sm">
+            {% for f in folders %}
+                <a href="{{ url_for('view_folder', folder_id=f.id) }}" class="list-group-item list-group-item-action">
+                     {# ফোল্ডারের জন্য নির্দিষ্ট আইকন #}
+                     <span class="file-icon"><i class="fas fa-folder text-warning"></i></span>
+                     <div class="file-details justify-content-start">
+                         <span class="file-name">{{ f.name }}</span>
+                     </div>
+                     <div class="file-actions ml-2">
+                     </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">কোনো ফোল্ডার তৈরি করা হয়নি।</p>
+    {% endif %}
+    <hr class="mb-4">
 
-                        {% if item.mime_type %}
-                            {% if item.mime_type.startswith('image/') %}
-                                {% set icon_class = 'fa-file-image' %}
-                                {% set icon_color = 'text-success' %}
-                            {% elif item.mime_type.startswith('video/') %}
-                                {% set icon_class = 'fa-file-video' %}
-                                {% set icon_color = 'text-info' %}
-                            {% elif item.mime_type.startswith('audio/') %}
-                                {% set icon_class = 'fa-file-audio' %}
-                                {% set icon_color = 'text-warning' %}
-                            {% elif item.mime_type == 'application/pdf' %}
-                                {% set icon_class = 'fa-file-pdf' %}
-                                {% set icon_color = 'text-danger' %}
-                            {% elif item.mime_type == 'text/html' %}
-                                {% set icon_class = 'fa-html5' %} {# Specific HTML5 icon #}
-                                {% set icon_color = 'text-orange' %} {# Needs custom CSS for text-orange #}
-                             {% elif item.mime_type.startswith('text/') or item.mime_type in ['application/javascript', 'application/json', 'application/xml'] %}
-                                 {% set icon_class = 'fa-file-code' %} {# Code icon for text, js, json etc. #}
-                                 {% set icon_color = 'text-info' %}
-                             {% elif item.mime_type == 'application/vnd.android.package-archive' %}
-                                 {% set icon_class = 'fab fa-android' %} {# Android icon for APK #}
-                                 {% set icon_color = 'text-success' %}
-                             {% elif item.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %}
-                                 {% set icon_class = 'fa-file-word' %}
-                                 {% set icon_color = 'text-primary' %}
-                             {% elif item.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
-                                 {% set icon_class = 'fa-file-excel' %}
-                                 {% set icon_color = 'text-success' %}
-                             {% elif item.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %}
-                                 {% set icon_class = 'fa-file-powerpoint' %}
-                                 {% set icon_color = 'text-warning' %}
-                             {% elif item.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %}
-                                 {% set icon_class = 'fa-file-archive' %}
-                                 {% set icon_color = 'text-secondary' %}
-                             {% endif %}
-                        {% endif %}
-                        <span class="file-icon"><i class="fas {{ icon_class }} {{ icon_color }}"></i></span>
+    {# রুটের ফাইলগুলো #}
+    <h4 class="text-primary mb-3"><i class="fas fa-file-alt mr-2"></i> মূল ফোল্ডারের ফাইলসমূহ (রুট)</h4>
+     {% if root_files %}
+        <ul class="list-group mb-4 shadow-sm">
+            {% for file in root_files %}
+            <li class="list-group-item px-0 px-md-2">
 
-                        {# ফাইল ডিটেইলস আগের মতোই #}
-                        <div class="file-details">
-                            <a href="{{ url_for('view_file', file_id=item.id) }}" class="file-name" title="{{ item.name }}">
-                                 {{ item.name | truncate(50) }}
-                            </a>
-                            <div class="file-meta">
-                                {% if item.size %}
-                                <span class="file-size mr-3 d-none d-md-inline">{{ item.size | filesizeformat }}</span>
-                                {% endif %}
-                                {% if item.upload_time %}
-                                <span class="file-date text-muted"><i class="far fa-clock mr-1"></i> {{ item.upload_time | datetimeformat }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
+                 {# --- আপডেটেড আইকন নির্ধারণের লজিক --- #}
+                 {% set icon_class = 'fa-file-alt' %} {# ডিফল্ট #}
+                 {% set icon_color_class = '' %} {# ডিফল্ট রঙ #}
+                 {% if file.mime_type %}
+                     {% if file.mime_type.startswith('image/') %}
+                         {% set icon_class = 'fa-file-image' %}
+                         {% set icon_color_class = 'text-purple' %}
+                     {% elif file.mime_type.startswith('video/') %}
+                         {% set icon_class = 'fa-file-video' %}
+                         {% set icon_color_class = 'text-warning' %}
+                     {% elif file.mime_type.startswith('audio/') %}
+                         {% set icon_class = 'fa-file-audio' %}
+                         {% set icon_color_class = 'text-info' %}
+                     {% elif file.mime_type == 'application/pdf' %}
+                         {% set icon_class = 'fa-file-pdf' %}
+                         {% set icon_color_class = 'text-danger' %}
+                     {% elif file.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %}
+                         {% set icon_class = 'fa-file-word' %}
+                         {% set icon_color_class = 'text-primary' %}
+                     {% elif file.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
+                         {% set icon_class = 'fa-file-excel' %}
+                         {% set icon_color_class = 'text-success' %}
+                     {% elif file.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %}
+                         {% set icon_class = 'fa-file-powerpoint' %}
+                         {% set icon_color_class = 'text-warning' %}
+                     {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %}
+                         {% set icon_class = 'fa-file-archive' %}
+                         {% set icon_color_class = 'text-secondary' %}
+                     {% elif file.mime_type == 'text/html' %}
+                         {% set icon_class = 'fa-html5' %}
+                         {% set icon_color_class = 'text-orange' %}
+                     {% elif file.mime_type in ['text/css', 'text/javascript', 'application/javascript', 'application/json', 'text/x-python', 'text/x-php', 'text/x-java-source', 'text/x-c'] or file.mime_type.endswith('+xml') %}
+                         {% set icon_class = 'fa-file-code' %}
+                         {% set icon_color_class = 'text-info' %}
+                     {% elif file.mime_type == 'application/vnd.android.package-archive' %}
+                         {% set icon_class = 'fa-android' %}
+                         {% set icon_color_class = 'text-success' %}
+                     {% elif file.mime_type.startswith('text/') %}
+                          {% set icon_class = 'fa-file-lines' %}
+                          {% set icon_color_class = 'text-secondary' %}
+                     {% endif %}
+                 {% endif %}
+                 <span class="file-icon"><i class="fas {{ icon_class }} {{ icon_color_class }}"></i></span>
+                 {# --- আইকন নির্ধারণের লজিক শেষ --- #}
 
-                        {# ফাইল অ্যাকশন ড্রপডাউন আগের মতোই #}
-                        <div class="file-actions ml-2">
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton{{ item.id }}" data-toggle="dropdown" aria-expanded="false" aria-label="File options">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton{{ item.id }}">
-                                    <a class="dropdown-item" href="{{ url_for('view_file', file_id=item.id) }}"><i class="fas fa-eye fa-fw mr-2"></i>দেখুন</a>
-                                    <a class="dropdown-item" href="{{ url_for('download_file', file_id=item.id) }}"><i class="fas fa-download fa-fw mr-2"></i>ডাউনলোড</a>
-                                    <div class="dropdown-divider"></div>
-                                    <form method="post" action="{{ url_for('create_share_link', file_id=item.id) }}" class="dropdown-item p-0">
-                                        <button type="submit" class="btn btn-link text-decoration-none text-body w-100 text-left pl-3"><i class="fas fa-share-alt fa-fw mr-2"></i>শেয়ার</button>
-                                    </form>
-                                    <button type="button" class="dropdown-item" data-toggle="modal" data-target="#moveModal{{ item.id }}"><i class="fas fa-arrows-alt-v fa-fw mr-2"></i>মুভ</button>
-                                    <div class="dropdown-divider"></div>
-                                    <form method="post" action="{{ url_for('delete_file', file_id=item.id) }}" class="dropdown-item p-0" onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ফাইলটি ট্র্যাশে পাঠাতে চান?');">
-                                        <button type="submit" class="btn btn-link text-danger text-decoration-none w-100 text-left pl-3"><i class="fas fa-trash-alt fa-fw mr-2"></i>ডিলিট (ট্র্যাশ)</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div> {# /file-actions #}
-                    </div> {# /list-group-item (for file) #}
+                 <div class="file-details">
+                     <a href="{{ url_for('view_file', file_id=file.id) }}" class="file-name" title="{{ file.original_filename }}">
+                          {{ file.original_filename | truncate(50) }}
+                     </a>
+                     <div class="file-meta">
+                          {% if file.upload_time %}
+                             <span class="file-date text-muted"><i class="far fa-clock mr-1"></i> {{ file.upload_time | datetimeformat }}</span>
+                          {% endif %}
+                     </div>
+                 </div>
 
-                    {# --- মুভ মডাল (ফাইলের জন্য) --- #}
-                    {# এই মডালটি আগের মতোই থাকবে, তবে নিশ্চিত করুন যে 'folders' ভেরিয়েবলটি এখনও পাস করা হচ্ছে #}
-                    <div class="modal fade" id="moveModal{{ item.id }}" tabindex="-1" aria-labelledby="moveModalLabel{{ item.id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-sm">
-                            <div class="modal-content">
-                                <form method="post" action="{{ url_for('move_file', file_id=item.id) }}">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title text-primary" id="moveModalLabel{{ item.id }}"><i class="fas fa-arrows-alt-v mr-2"></i> ফাইল মুভ করুন</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p><small>ফাইল: {{ item.name | truncate(40)}}</small></p>
-                                        <div class="form-group">
-                                            <label for="target_folder_id{{ item.id }}">কোথায় মুভ করবেন?</label>
-                                            <select name="target_folder_id" id="target_folder_id{{ item.id }}" class="form-control custom-select" required>
-                                                {% if not folders %}
-                                                    <option value="" disabled selected>কোনো ফোল্ডার নেই</option>
-                                                {% else %}
-                                                    <option value="" disabled selected>-- ফোল্ডার নির্বাচন করুন --</option>
-                                                    {% for f in folders %}
-                                                        {# Ensure a file cannot be moved to the folder it's already in - Requires current_folder_id passed from backend #}
-                                                        {# {% if f.id != current_folder_id %} #}
-                                                        <option value="{{ f.id }}">{{ f.name }}</option>
-                                                        {# {% endif %} #}
-                                                    {% endfor %}
-                                                {% endif %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">বাতিল করুন</button>
-                                        <button type="submit" class="btn btn-primary btn-sm" {% if not folders %}disabled{% endif %}><i class="fas fa-check mr-1"></i> মুভ করুন</button>
-                                    </div>
-                                </form>
-                            </div>
+                <div class="file-actions ml-2">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton{{ file.id }}" data-toggle="dropdown" aria-expanded="false" aria-label="File options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton{{ file.id }}">
+                            <a class="dropdown-item" href="{{ url_for('view_file', file_id=file.id) }}"><i class="fas fa-eye fa-fw mr-2"></i>দেখুন</a>
+                            <a class="dropdown-item" href="{{ url_for('download_file', file_id=file.id) }}"><i class="fas fa-download fa-fw mr-2"></i>ডাউনলোড</a>
+                            <div class="dropdown-divider"></div>
+                            <form method="post" action="{{ url_for('create_share_link', file_id=file.id) }}" class="dropdown-item p-0">
+                                 <button type="submit" class="btn btn-link text-decoration-none text-body w-100 text-left pl-3"><i class="fas fa-share-alt fa-fw mr-2"></i>শেয়ার</button>
+                             </form>
+                            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#moveModal{{ file.id }}"><i class="fas fa-arrows-alt-v fa-fw mr-2"></i>মুভ</button>
+                            <div class="dropdown-divider"></div>
+                             <form method="post" action="{{ url_for('delete_file', file_id=file.id) }}" class="dropdown-item p-0" onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ফাইলটি ট্র্যাশে পাঠাতে চান?');">
+                                <button type="submit" class="btn btn-link text-danger text-decoration-none w-100 text-left pl-3"><i class="fas fa-trash-alt fa-fw mr-2"></i>ডিলিট (ট্র্যাশ)</button>
+                            </form>
                         </div>
                     </div>
-                     {# --- End Move Modal --- #}
+                </div>{# /file-actions #}
+            </li>
 
-                {% endif %} {# End if item.is_directory #}
-            {% endfor %} {# End items loop #}
-        </div> {# /list-group #}
+             {# --- Move Modal for this file --- #}
+            <div class="modal fade" id="moveModal{{ file.id }}" tabindex="-1" aria-labelledby="moveModalLabel{{ file.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                  <form method="post" action="{{ url_for('move_file', file_id=file.id) }}">
+                    <div class="modal-header">
+                      <h5 class="modal-title text-primary" id="moveModalLabel{{ file.id }}"><i class="fas fa-arrows-alt-v mr-2"></i> ফাইল মুভ করুন</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                      <p><small>ফাইল: {{ file.original_filename | truncate(40)}}</small></p>
+                      <div class="form-group">
+                          <label for="target_folder_id{{ file.id }}">কোথায় মুভ করবেন?</label>
+                          <select name="target_folder_id" id="target_folder_id{{ file.id }}" class="form-control custom-select" required>
+                              {% if not folders %}
+                                <option value="" disabled selected>কোনো ফোল্ডার নেই</option>
+                              {% else %}
+                                 <option value="" disabled selected>-- ফোল্ডার নির্বাচন করুন --</option>
+                                 {% for f in folders %}
+                                     <option value="{{ f.id }}">{{ f.name }}</option>
+                                 {% endfor %}
+                              {% endif %}
+                          </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">বাতিল করুন</button>
+                      <button type="submit" class="btn btn-primary btn-sm" {% if not folders %}disabled{% endif %}><i class="fas fa-check mr-1"></i> মুভ করুন</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {# --- End Move Modal --- #}
+
+            {% endfor %} {# End file loop #}
+        </ul>{# /list-group #}
     {% else %}
-        {# একত্রিত লিস্ট খালি থাকলে এই বার্তা দেখানো হবে #}
         <div class="text-center p-5 my-4 bg-light rounded">
-          <i class="fas fa-folder-open fa-3x mb-3 text-muted"></i>
-          <p class="lead text-muted">এই ফোল্ডারটি খালি।</p>
-          <p>ফাইল আপলোড করুন অথবা নতুন ফোল্ডার তৈরি করুন।</p>
+          <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
+          <p class="lead text-muted">মূল ফোল্ডারে (রুটে) কোনো ফাইল আপলোড করা হয়নি।</p>
         </div>
-    {% endif %} {# End if items #}
+    {% endif %} {# End if root_files #}
 
-{% endblock %}
-
-{% block scripts %}
-    {{ super() }} {# Include base scripts #}
-    {# Add specific scripts if needed, e.g., for modal focus #}
-    <script>
-        // Autofocus on move modal input when shown (if select is the first focusable)
-        $('.modal').on('shown.bs.modal', function () {
-             $(this).find('select:first').focus();
-         });
-         // Add custom CSS for text-orange if not defined in base.html or main CSS
-         // Example:
-         // const style = document.createElement('style');
-         // style.innerHTML = '.text-orange { color: orange !important; }';
-         // document.head.appendChild(style);
-    </script>
 {% endblock %}
