@@ -1,171 +1,194 @@
-{# home.html #}
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block title %}হোম - ফাইল সার্ভার{% endblock %}
 
 {% block content %}
-  <div class="upload-section shadow-sm mb-4">
-    <h4 class="mb-3 text-primary"><i class="fas fa-cloud-upload-alt mr-2"></i> নতুন ফাইল আপলোড করুন</h4>
-    {# নিশ্চিত করুন 'upload_file' আপনার Flask আপলোড রুটের সঠিক endpoint নাম #}
-    <form method="post" enctype="multipart/form-data" action="{{ url_for('upload_file') }}"> {# <--- এখানেই পরিবর্তন করা হয়েছে #}
-        {# Add hidden input for current path if needed #}
-        {# <input type="hidden" name="current_path" value="{{ current_path }}"> #}
-        <div class="form-group">
-             <div class="custom-file">
-                 <input type="file" class="custom-file-input" id="customFile" name="file" required>
-                 {# Label টি জাভাস্ক্রিপ্ট দ্বারা আপডেট হবে #}
-                 <label class="custom-file-label" for="customFile">ফাইল নির্বাচন করুন...</label>
-             </div>
-        </div>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> আপলোড করুন</button>
-    </form>
-  </div>
-
-  <div class="file-list-section">
-    <h4 class="mb-3 text-primary"><i class="fas fa-folder-open mr-2"></i> আপনার ফাইলসমূহ</h4>
-
-    {# Optional: Breadcrumbs for navigation if you have folders #}
-    {# Example:
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('home', path='/') }}">Root</a></li>
-        {% for part in current_path.strip('/').split('/') %}
-          {% if loop.last %}
-            <li class="breadcrumb-item active" aria-current="page">{{ part }}</li>
-          {% else %}
-            {# Construct path for intermediate folders #}
-            {# <li class="breadcrumb-item"><a href="{{ url_for('home', path=...) }}">{{ part }}</a></li> #}
-          {# {% endif %}
-        {% endfor %}
-      </ol>
-    </nav>
-    #}
-
-    {# Pass 'files' list from your Flask route #}
-    {% if files %}
-      <ul class="list-group list-group-flush">
-        {# Loop through files/folders passed from the backend #}
-        {% for file in files %}
-          <li class="list-group-item px-0 px-md-2"> {# Reduced padding on small screens #}
-              {# Determine icon based on file type (requires logic in backend or complex Jinja) #}
-              {# Ensure 'file' object has 'is_directory' and 'mime_type' attributes #}
-              {% set icon_class = 'fa-file-alt' %} {# Default icon #}
-              {% if file.is_directory %}
-                  {% set icon_class = 'fa-folder text-warning' %} {# Folder with different color #}
-              {% elif file.mime_type and file.mime_type.startswith('image/') %}
-                  {% set icon_class = 'fa-file-image' %}
-              {% elif file.mime_type == 'application/pdf' %}
-                  {% set icon_class = 'fa-file-pdf text-danger' %} {# PDF with different color #}
-              {% elif file.mime_type and file.mime_type.startswith('audio/') %}
-                   {% set icon_class = 'fa-file-audio' %}
-              {% elif file.mime_type and file.mime_type.startswith('video/') %}
-                  {% set icon_class = 'fa-file-video' %}
-              {% elif file.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %}
-                   {% set icon_class = 'fa-file-word text-info' %} {# Word with different color #}
-              {% elif file.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
-                   {% set icon_class = 'fa-file-excel text-success' %} {# Excel with different color #}
-              {% elif file.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %}
-                   {% set icon_class = 'fa-file-powerpoint text-warning' %} {# PowerPoint different color #}
-              {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %}
-                   {% set icon_class = 'fa-file-archive text-secondary' %} {# Archive different color #}
-              {% endif %}
-               <span class="file-icon"><i class="fas {{ icon_class }}"></i></span>
-
-               <div class="file-details">
-                   {# Link to view/download the file or enter directory #}
-                   {# Replace 'view_or_download' and 'item_id' with your actual endpoint and identifier #}
-                   <a href="{{ url_for('view_or_download', item_id=file.id) }}" class="file-name" title="{{ file.name }}">
-                       {{ file.name }}
-                   </a>
-
-                   {# Optional: Display file size and modified date #}
-                   <div class="file-meta">
-                       {# Ensure 'file' object has 'size' and 'modified_date' attributes #}
-                       {# Also ensure you have a 'filesizeformat' filter available #}
-                       {% if file.size and not file.is_directory %}
-                         <span class="file-size mr-3 d-none d-md-inline">{{ file.size | filesizeformat }}</span> {# Hide size on small screens #}
-                       {% endif %}
-                       {% if file.modified_date %}
-                          <span class="file-date text-muted"><i class="far fa-clock mr-1"></i> {{ file.modified_date.strftime('%Y-%m-%d %H:%M') }}</span> {# Format date #}
-                       {% endif %}
-                   </div>
-               </div>
-
-               {# Action Buttons Dropdown #}
-               {# Ensure endpoints 'share_file', 'rename_item', 'move_to_trash' exist #}
-               <div class="file-actions ml-2">
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-label="File options">
-                      <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                      {# Example Actions - adjust urls and logic as needed #}
-                      <a class="dropdown-item" href="{{ url_for('view_or_download', item_id=file.id) }}"><i class="fas fa-eye fa-fw mr-2"></i>দেখুন/ডাউনলোড</a>
-                      <a class="dropdown-item" href="{{ url_for('share_file', item_id=file.id) }}"><i class="fas fa-share-alt fa-fw mr-2"></i>শেয়ার</a>
-                      {# Rename might need a modal - ensure modal target/id matches #}
-                      <a class="dropdown-item" href="#" data-toggle="modal" data-target="#renameModal-{{ file.id }}"><i class="fas fa-edit fa-fw mr-2"></i>নাম পরিবর্তন</a>
-                      <div class="dropdown-divider"></div>
-                      {# Confirmation added via JS #}
-                      <a class="dropdown-item text-danger" href="{{ url_for('move_to_trash', item_id=file.id) }}" onclick="return confirm('আপনি কি নিশ্চিতভাবে এই আইটেমটি ট্র্যাশে সরাতে চান?');"><i class="fas fa-trash-alt fa-fw mr-2"></i>ট্র্যাশে সরান</a>
+    {# আপলোড এবং ফোল্ডার তৈরির সেকশন #}
+    {# Applied styles similar to 'upload-section' but adapted to row structure #}
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3 mb-md-0">
+             <div class="p-3 border rounded bg-light shadow-sm h-100"> {# Added shadow & bg-light from theme #}
+                <h4 class="text-primary mb-3"><i class="fas fa-cloud-upload-alt mr-2"></i> ফাইল আপলোড করুন</h4>
+                <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+                     <div class="form-group">
+                        <label for="file_upload">ফাইল নির্বাচন করুন</label>
+                        {# Basic file input styling - consider Bootstrap custom file input if needed #}
+                        <input type="file" class="form-control-file" name="file_upload" id="file_upload" required>
                     </div>
-                  </div>
-               </div>
-          </li>
-
-          {# Optional: Rename Modal (Example) - Generate unique IDs #}
-          {# Ensure 'rename_item' endpoint exists and handles POST request #}
-          <div class="modal fade" id="renameModal-{{ file.id }}" tabindex="-1" aria-labelledby="renameModalLabel-{{ file.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="renameModalLabel-{{ file.id }}">"'{{ file.name | truncate(30) }}'" এর নাম পরিবর্তন করুন</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <form action="{{ url_for('rename_item', item_id=file.id) }}" method="post">
-                  <div class="modal-body">
                     <div class="form-group">
-                       <label for="newName-{{ file.id }}">নতুন নাম:</label>
-                       <input type="text" class="form-control" id="newName-{{ file.id }}" name="new_name" value="{{ file.name }}" required>
+                        <label for="folder_id">কোন ফোল্ডারে রাখবেন?</label>
+                        <select name="folder_id" id="folder_id" class="form-control custom-select"> {# Added custom-select #}
+                            <option value="root">-- মূল ফোল্ডার (রুট) --</option>
+                            {% for f in folders %} {# folders variable passed from route #}
+                            <option value="{{ f.id }}">{{ f.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">বাতিল করুন</button>
-                    <button type="submit" class="btn btn-primary">সংরক্ষণ করুন</button>
-                  </div>
+                    {# Changed button to btn-primary and added icon #}
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> আপলোড করুন</button>
                 </form>
+            </div>
+        </div>
+        <div class="col-md-6">
+             <div class="p-3 border rounded bg-light shadow-sm h-100"> {# Added shadow & bg-light from theme #}
+                <h4 class="text-primary mb-3"><i class="fas fa-folder-plus mr-2"></i> নতুন ফোল্ডার তৈরি করুন</h4>
+                <form method="post" action="{{ url_for('create_folder') }}">
+                      <div class="form-group">
+                         <label for="folder_name">ফোল্ডারের নাম</label>
+                        <input type="text" class="form-control" name="folder_name" id="folder_name" placeholder="নতুন ফোল্ডারের নাম দিন" required>
+                    </div>
+                     {# Changed button to btn-primary and added icon #}
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> তৈরি করুন</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <hr class="mb-4"> {# Added margin bottom #}
+
+    {# ফোল্ডার লিস্ট #}
+    <h4 class="text-primary mb-3"><i class="fas fa-folder mr-2"></i> আপনার ফোল্ডারসমূহ</h4>
+    {% if folders %}
+        <div class="list-group mb-4 shadow-sm"> {# Added shadow #}
+            {% for f in folders %}
+                {# Applied list-group-item styling from base.html #}
+                <a href="{{ url_for('view_folder', folder_id=f.id) }}" class="list-group-item list-group-item-action">
+                     <span class="file-icon"><i class="fas fa-folder text-warning"></i></span> {# Specific folder icon #}
+                     <div class="file-details justify-content-start"> {# Adjusted alignment #}
+                         <span class="file-name">{{ f.name }}</span>
+                     </div>
+                     {# Placeholder for potential actions/info #}
+                     <div class="file-actions ml-2">
+                         {# Example: Add delete/rename buttons here if needed later
+                         <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt"></i></button>
+                         #}
+                     </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">কোনো ফোল্ডার তৈরি করা হয়নি।</p>
+    {% endif %}
+    <hr class="mb-4"> {# Added margin bottom #}
+
+    {# রুটের ফাইলগুলো #}
+    <h4 class="text-primary mb-3"><i class="fas fa-file-alt mr-2"></i> মূল ফোল্ডারের ফাইলসমূহ (রুট)</h4>
+     {% if root_files %}
+        <ul class="list-group mb-4 shadow-sm"> {# Added shadow #}
+            {% for file in root_files %}
+            {# Applied list-group-item styling from base.html #}
+            <li class="list-group-item px-0 px-md-2">
+
+                 {# Dynamic Icon Logic - Requires file.mime_type from backend #}
+                 {% set icon_class = 'fa-file-alt' %} {# Default icon #}
+                 {% if file.mime_type and file.mime_type.startswith('image/') %}
+                     {% set icon_class = 'fa-file-image' %}
+                 {% elif file.mime_type == 'application/pdf' %}
+                     {% set icon_class = 'fa-file-pdf text-danger' %}
+                 {% elif file.mime_type and file.mime_type.startswith('audio/') %}
+                      {% set icon_class = 'fa-file-audio' %}
+                 {% elif file.mime_type and file.mime_type.startswith('video/') %}
+                     {% set icon_class = 'fa-file-video' %}
+                 {% elif file.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %}
+                      {% set icon_class = 'fa-file-word text-info' %}
+                 {% elif file.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
+                      {% set icon_class = 'fa-file-excel text-success' %}
+                 {% elif file.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %}
+                      {% set icon_class = 'fa-file-powerpoint text-warning' %}
+                 {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %}
+                      {% set icon_class = 'fa-file-archive text-secondary' %}
+                 {% endif %}
+                  <span class="file-icon"><i class="fas {{ icon_class }}"></i></span>
+
+                 <div class="file-details">
+                     {# File name as link #}
+                     <a href="{{ url_for('view_file', file_id=file.id) }}" class="file-name" title="{{ file.original_filename }}">
+                          {{ file.original_filename | truncate(50) }} {# Truncate long names #}
+                     </a>
+                      {# File meta data #}
+                     <div class="file-meta">
+                          {# Add file size if available from backend as file.size #}
+                          {# {% if file.size %}
+                            <span class="file-size mr-3 d-none d-md-inline">{{ file.size | filesizeformat }}</span>
+                          {% endif %} #}
+                          {% if file.upload_time %}
+                              {# Ensure datetimeformat filter is available #}
+                             <span class="file-date text-muted"><i class="far fa-clock mr-1"></i> {{ file.upload_time | datetimeformat }}</span>
+                          {% endif %}
+                     </div>
+                 </div>
+
+                <div class="file-actions ml-2">
+                    <div class="dropdown">
+                         {# Changed dropdown button style #}
+                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton{{ file.id }}" data-toggle="dropdown" aria-expanded="false" aria-label="File options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton{{ file.id }}">
+                             {# Added icons to dropdown items #}
+                            <a class="dropdown-item" href="{{ url_for('view_file', file_id=file.id) }}"><i class="fas fa-eye fa-fw mr-2"></i>দেখুন</a>
+                            <a class="dropdown-item" href="{{ url_for('download_file', file_id=file.id) }}"><i class="fas fa-download fa-fw mr-2"></i>ডাউনলোড</a>
+                            <div class="dropdown-divider"></div>
+                            {# Share Button Form - ensure text color is appropriate #}
+                            <form method="post" action="{{ url_for('create_share_link', file_id=file.id) }}" class="dropdown-item p-0">
+                                 <button type="submit" class="btn btn-link text-decoration-none text-body w-100 text-left pl-3"><i class="fas fa-share-alt fa-fw mr-2"></i>শেয়ার</button>
+                             </form>
+                             {# Move Button Trigger #}
+                            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#moveModal{{ file.id }}"><i class="fas fa-arrows-alt-v fa-fw mr-2"></i>মুভ</button>
+                            <div class="dropdown-divider"></div>
+                             {# Delete Button Form - ensure text color is appropriate #}
+                             <form method="post" action="{{ url_for('delete_file', file_id=file.id) }}" class="dropdown-item p-0" onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ফাইলটি ট্র্যাশে পাঠাতে চান?');">
+                                <button type="submit" class="btn btn-link text-danger text-decoration-none w-100 text-left pl-3"><i class="fas fa-trash-alt fa-fw mr-2"></i>ডিলিট (ট্র্যাশ)</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>{# /file-actions #}
+            </li>
+
+             {# --- Move Modal for this file (Styled) --- #}
+            <div class="modal fade" id="moveModal{{ file.id }}" tabindex="-1" aria-labelledby="moveModalLabel{{ file.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-sm"> {# Centered modal #}
+                <div class="modal-content">
+                  <form method="post" action="{{ url_for('move_file', file_id=file.id) }}">
+                    <div class="modal-header">
+                      <h5 class="modal-title text-primary" id="moveModalLabel{{ file.id }}"><i class="fas fa-arrows-alt-v mr-2"></i> ফাইল মুভ করুন</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                      <p><small>ফাইল: {{ file.original_filename | truncate(40)}}</small></p>
+                      <div class="form-group">
+                          <label for="target_folder_id{{ file.id }}">কোথায় মুভ করবেন?</label>
+                           {# Added custom-select #}
+                          <select name="target_folder_id" id="target_folder_id{{ file.id }}" class="form-control custom-select" required>
+                              {% if not folders %}
+                                <option value="" disabled selected>কোনো ফোল্ডার নেই</option>
+                              {% else %}
+                                 <option value="" disabled selected>-- ফোল্ডার নির্বাচন করুন --</option>
+                                 {% for f in folders %}
+                                     <option value="{{ f.id }}">{{ f.name }}</option>
+                                 {% endfor %}
+                              {% endif %}
+                          </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">বাতিল করুন</button>
+                      {# Changed button to btn-primary #}
+                      <button type="submit" class="btn btn-primary btn-sm" {% if not folders %}disabled{% endif %}><i class="fas fa-check mr-1"></i> মুভ করুন</button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
+            {# --- End Move Modal --- #}
 
-        {% endfor %} {# End of file loop #}
-      </ul>
+            {% endfor %} {# End file loop #}
+        </ul>{# /list-group #}
     {% else %}
-      {# Empty state message #}
-      <div class="text-center p-5 my-4 bg-light rounded">
+        {# Styled empty state message #}
+        <div class="text-center p-5 my-4 bg-light rounded">
           <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
-          <p class="lead text-muted">কোন ফাইল বা ফোল্ডার পাওয়া যায়নি।</p>
-          <p>শুরু করতে কিছু ফাইল আপলোড করুন!</p>
-      </div>
-    {% endif %} {# End of if files #}
-  </div> {# End of file-list-section #}
-{% endblock %} {# End of content block #}
+          <p class="lead text-muted">মূল ফোল্ডারে (রুটে) কোনো ফাইল আপলোড করা হয়নি।</p>
+        </div>
+    {% endif %} {# End if root_files #}
 
-{% block scripts %}
-{{ super() }} {# Include scripts from base.html if any #}
-<script>
-    // Optional: Add any page-specific JavaScript here
-    // console.log("Home page scripts loaded.");
-
-    // Example: Initialize tooltips if you use them for better UX
-    // $(function () {
-    //   $('[data-toggle="tooltip"]').tooltip()
-    // })
-
-    // Autofocus on rename modal input when shown
-    $('.modal').on('shown.bs.modal', function () {
-        $(this).find('input[type=text]:first').focus();
-    });
-</script>
-{% endblock %} {# End of scripts block #}
+{% endblock %}
