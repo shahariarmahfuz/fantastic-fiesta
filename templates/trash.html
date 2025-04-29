@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}ট্র্যাশ বিন{% endblock %}
+
+{% block content %}
+    <h2 class="mb-4">🗑️ ট্র্যাশ বিন</h2>
+
+    {% if deleted_files %}
+        <p>এখানে আপনার মুছে ফেলা ফাইলগুলো ৩০ দিন পর্যন্ত থাকতে পারে (যদি এই ফিচারটি যোগ করা হয়), অথবা আপনি স্থায়ীভাবে মুছে ফেলতে পারেন।</p>
+        <ul class="list-group">
+            {% for file in deleted_files %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="file-item">
+                    <span class="file-icon text-muted">📄</span> {# Icon for deleted file #}
+                    <div class="d-flex flex-column">
+                        <span class="text-muted" style="text-decoration: line-through;">{{ file.original_filename }}</span>
+                        <small class="text-danger">মুছে ফেলা হয়েছে: {{ file.deleted_time | datetimeformat }}</small>
+                     </div>
+                </div>
+
+                <div class="file-actions">
+                    {# Restore Button Form #}
+                    <form method="post" action="{{ url_for('restore_file', file_id=file.id) }}" style="display: inline-block;" class="mr-1">
+                        <button type="submit" class="btn btn-sm btn-success" title="ফাইলটি পুনরুদ্ধার করুন">রিস্টোর</button>
+                    </form>
+                    {# Delete Permanently Button Form #}
+                    <form method="post" action="{{ url_for('delete_permanently', file_id=file.id) }}" style="display: inline-block;" onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ফাইলটি স্থায়ীভাবে মুছে ফেলতে চান? এটি আর পুনরুদ্ধার করা যাবে না।');">
+                        <button type="submit" class="btn btn-sm btn-danger" title="স্থায়ীভাবে ডিলিট করুন">স্থায়ীভাবে ডিলিট</button>
+                    </form>
+                </div>{# /file-actions #}
+            </li>
+            {% endfor %}
+        </ul>
+        {# Add "Empty Trash" button later if needed #}
+    {% else %}
+        <p class="text-center text-muted mt-5">আপনার ট্র্যাশ বিন খালি।</p>
+    {% endif %}
+
+{% endblock %}

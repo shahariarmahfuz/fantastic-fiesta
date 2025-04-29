@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}ফোল্ডার: {{ folder.name }}{% endblock %}
+
+{% block content %}
+    {# ফোল্ডারের নাম এবং ফিরে যাওয়ার লিঙ্ক #}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="mb-0">📁 {{ folder.name }}</h2>
+      <a href="{{ url_for('home') }}" class="btn btn-sm btn-outline-secondary">&leftarrow; হোম পেজে ফিরে যান</a>
+    </div>
+    <hr>
+
+    {# এই ফোল্ডারে ফাইল আপলোড করার ফর্ম #}
+    <div class="card mb-4 upload-section">
+        <div class="card-header">এই ফোল্ডারে ফাইল আপলোড করুন</div>
+        <div class="card-body">
+             <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+                 <div class="form-group">
+                    <label for="file_upload">ফাইল নির্বাচন করুন</label>
+                    <input type="file" class="form-control-file" name="file_upload" id="file_upload" required>
+                </div>
+                <input type="hidden" name="folder_id" value="{{ folder.id }}"> {# Current folder ID #}
+                <button type="submit" class="btn btn-success">আপলোড</button>
+            </form>
+        </div>
+    </div>
+    <hr>
+
+    {# ফোল্ডারের ভিতরের ফাইলগুলো #}
+    <h3>📄 ফোল্ডারের ফাইলসমূহ</h3>
+     {% if files %} {# 'files' variable passed from route #}
+        <ul class="list-group">
+            {% for file in files %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="file-item">
+                     <span class="file-icon">📄</span> {# Generic icon #}
+                     <div class="d-flex flex-column">
+                         <a href="{{ url_for('view_file', file_id=file.id) }}" title="ফাইল দেখুন">{{ file.original_filename }}</a>
+                         <small class="text-muted">আপলোড: {{ file.upload_time | datetimeformat }}</small>
+                     </div>
+                </div>
+
+                <div class="file-actions">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ file.id }}" data-toggle="dropdown" aria-expanded="false" title="অপশন">
+                            ⋮
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton{{ file.id }}">
+                            <a class="dropdown-item" href="{{ url_for('view_file', file_id=file.id) }}">দেখুন</a>
+                            <a class="dropdown-item" href="{{ url_for('download_file', file_id=file.id) }}">ডাউনলোড</a>
+                            <div class="dropdown-divider"></div>
+                            {# Share Button Form #}
+                            <form method="post" action="{{ url_for('create_share_link', file_id=file.id) }}" class="dropdown-item p-0">
+                                 <button type="submit" class="btn btn-link text-decoration-none text-body w-100 text-left pl-3">শেয়ার</button>
+                             </form>
+                             {# Move Button Trigger #}
+                            <button type="button" class="dropdown-item" data-toggle="modal" data-target="#moveModal{{ file.id }}">মুভ</button>
+                            <div class="dropdown-divider"></div>
+                             {# Delete Button Form #}
+                             <form method="post" action="{{ url_for('delete_file', file_id=file.id) }}" class="dropdown-item p-0" onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ফাইলটি ট্র্যাশে পাঠাতে চান?');">
+                                <button type="submit" class="btn btn-link text-danger text-decoration-none w-100 text-left pl-3">ডিলিট (ট্র্যাশ)</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>{# /file-actions #}
+            </li>
+
+             {# --- Move Modal for this file --- #}
+             <div class="modal fade" id="moveModal{{ file.id }}" tabindex="-1" aria-labelledby="moveModalLabel{{ file.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                  <form method="post" action="{{ url_for('move_file', file_id=file.id) }}">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="moveModalLabel{{ file.id }}">ফাইল মুভ করুন</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                      <p><small>ফাইল: {{ file.original_filename | truncate(40)}}</small></p>
+                      <div class="form-group">
+                          <label for="target_folder_id{{ file.id }}">কোথায় মুভ করবেন?</label>
+                          <select name="target_folder_id" id="target_folder_id{{ file.id }}" class="form-control" required>
+                              <option value="root">-- মূল ফোল্ডার (রুট) --</option>
+                              {# 'folders' is the list of ALL folders passed from route #}
+                              {# 'folder' is the current folder object #}
+                              {% for f in folders %}
+                                  {# Exclude the current folder #}
+                                  {% if f.id != folder.id %}
+                                       <option value="{{ f.id }}">{{ f.name }}</option>
+                                  {% endif %}
+                              {% endfor %}
+                          </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">বাতিল</button>
+                      <button type="submit" class="btn btn-primary btn-sm">মুভ করুন</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {# --- End Move Modal --- #}
+
+            {% endfor %}
+        </ul>{# /list-group #}
+    {% else %}
+        <p>এই ফোল্ডারে কোনো ফাইল নেই।</p>
+    {% endif %}
+
+{% endblock %}
+

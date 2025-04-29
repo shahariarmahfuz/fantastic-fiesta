@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}সাইন আপ{% endblock %}
+{% block content %}
+    <h2>নতুন অ্যাকাউন্ট তৈরি করুন</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="email">ইমেইল ঠিকানা</label> {# Changed label #}
+            <input type="email" class="form-control" name="email" id="email" required> {# Changed type and name #}
+        </div>
+        <div class="form-group">
+            <label for="password">পাসওয়ার্ড</label>
+            <input type="password" class="form-control" name="password" id="password" required>
+        </div>
+         <div class="form-group">
+            <label for="password_confirm">পাসওয়ার্ড নিশ্চিত করুন</label>
+            <input type="password" class="form-control" name="password_confirm" id="password_confirm" required>
+        </div>
+        <button type="submit" class="btn btn-primary">সাইন আপ</button>
+    </form>
+    <p class="mt-3">ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="{{ url_for('login') }}">এখানে লগইন করুন</a></p>
+{% endblock %}
+

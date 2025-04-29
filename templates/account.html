@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}আমার অ্যাকাউন্ট{% endblock %}
+
+{% block content %}
+    <h2>আমার অ্যাকাউন্ট</h2>
+    <hr>
+    <div class="row">
+        {# Profile Information Section #}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">প্রোফাইলের তথ্য</div>
+                <div class="card-body">
+                    <p><strong>ইমেইল:</strong> {{ user.email }}</p> {# Passed user object #}
+                    <form method="post" action="{{ url_for('update_profile') }}">
+                        <div class="form-group">
+                            <label for="name">আপনার নাম</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ user.name or '' }}" placeholder="আপনার পুরো নাম দিন">
+                             <small class="form-text text-muted">এই নামটি অ্যাপ্লিকেশনে দেখানো হবে।</small>
+                        </div>
+                        <button type="submit" class="btn btn-info">প্রোফাইল আপডেট করুন</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Change Password Section #}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">পাসওয়ার্ড পরিবর্তন করুন</div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('change_password') }}">
+                        <div class="form-group">
+                            <label for="current_password">বর্তমান পাসওয়ার্ড</label>
+                            <input type="password" class="form-control" name="current_password" id="current_password" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="new_password">নতুন পাসওয়ার্ড</label>
+                            <input type="password" class="form-control" name="new_password" id="new_password" required minlength="6"> {# Added minlength #}
+                             <small class="form-text text-muted">কমপক্ষে ৬ অক্ষর।</small>
+                        </div>
+                         <div class="form-group">
+                            <label for="confirm_password">নতুন পাসওয়ার্ড নিশ্চিত করুন</label>
+                            <input type="password" class="form-control" name="confirm_password" id="confirm_password" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn btn-warning">পাসওয়ার্ড পরিবর্তন করুন</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
