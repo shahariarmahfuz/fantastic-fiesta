@@ -5,28 +5,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     {# Optional: Add custom CSS link #}
     {# <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> #}
 
     <title>{% block title %}ফাইল সার্ভার{% endblock %}</title>
     <style>
-        body { padding-top: 5rem; } /* Navbar spacing */
-        .file-icon { font-size: 1.5rem; margin-right: 10px; }
-        .file-item { display: flex; align-items: center; }
-        .file-details { flex-grow: 1; display: flex; justify-content: space-between; align-items: center; }
-        .file-actions .dropdown-menu { min-width: auto; }
-        .upload-section { margin-bottom: 2rem; }
-        .list-group-item span { word-break: break-all; } /* Prevent long names breaking layout */
-        .preview-container { max-width: 100%; margin-top: 1rem; margin-bottom: 1rem; }
-        .preview-container img, .preview-container video, .preview-container embed, .preview-container audio { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-        .preview-container embed { height: 70vh; } /* Adjust PDF preview height */
-        /* Add other custom styles here */
+        :root {
+            --primary-color: #007bff; /* Bootstrap Primary Blue */
+            --light-bg: #f8f9fa; /* Light grey for subtle contrast */
+            --white-bg: #ffffff;
+        }
+
+        body {
+            padding-top: 70px; /* Adjust for fixed navbar height */
+            background-color: var(--white-bg); /* Ensure body background is white */
+        }
+        .navbar {
+            /* Making navbar lighter with blue accents */
+            background-color: var(--white-bg) !important;
+            border-bottom: 1px solid #dee2e6; /* Subtle border */
+        }
+        .navbar-brand {
+             color: var(--primary-color) !important; /* Blue brand */
+             font-weight: bold;
+        }
+        .nav-link {
+            color: #495057 !important; /* Darker grey for links */
+        }
+        .nav-link.active, .nav-link:hover {
+            color: var(--primary-color) !important; /* Blue for active/hover */
+        }
+        .navbar-toggler {
+            border-color: rgba(0, 123, 255, 0.5); /* Lighter blue border */
+        }
+        .navbar-toggler-icon {
+             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 123, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        .dropdown-item:active {
+             background-color: var(--primary-color); /* Blue background on active dropdown item */
+        }
+        .user-icon {
+             color: var(--primary-color); /* Blue user icon */
+             margin-right: 5px;
+        }
+        /* Custom button style */
+        .btn-primary {
+             background-color: var(--primary-color);
+             border-color: var(--primary-color);
+             /* Add transition for hover effect */
+             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+             background-color: #0056b3; /* Darker blue on hover */
+             border-color: #0056b3;
+        }
+        /* Outline button style */
+         .btn-outline-primary {
+             color: var(--primary-color);
+             border-color: var(--primary-color);
+             transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+         }
+         .btn-outline-primary:hover {
+             background-color: var(--primary-color);
+             color: var(--white-bg);
+         }
+         /* Link style */
+         a {
+            color: var(--primary-color);
+         }
+         a:hover {
+            color: #0056b3;
+            text-decoration: none; /* Optional: remove underline on hover */
+         }
+         /* Specific styles from original base.html, adapted */
+        .file-icon {
+            font-size: 1.5rem;
+            margin-right: 15px; /* Increased margin */
+            color: var(--primary-color); /* Blue icons */
+            width: 30px; /* Fixed width for alignment */
+            text-align: center;
+        }
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px; /* Space between items */
+            border: 1px solid #dee2e6; /* Subtle border for each item */
+            border-radius: .25rem; /* Rounded corners */
+             transition: background-color 0.15s ease-in-out;
+        }
+         .list-group-item:hover {
+             background-color: var(--light-bg); /* Slight highlight on hover */
+         }
+        .file-details {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-left: 15px;
+             overflow: hidden; /* Prevent long names from breaking layout badly */
+        }
+         .file-name {
+             font-weight: 500;
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+             margin-right: 15px; /* Space before actions */
+         }
+         .file-size, .file-date {
+             font-size: 0.85em;
+             color: #6c757d; /* Grey text for details */
+             margin-left: 15px;
+             white-space: nowrap;
+         }
+        .file-actions .dropdown-menu {
+            min-width: auto;
+        }
+        .file-actions .btn {
+             padding: .25rem .5rem; /* Smaller action buttons */
+             font-size: .875rem;
+        }
+        .upload-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: var(--light-bg); /* Light background for upload section */
+            border-radius: .3rem;
+            border: 1px solid #dee2e6;
+        }
+         .custom-file-input ~ .custom-file-label::after {
+             content: "ব্রাউজ করুন"; /* Translate Bootstrap's default */
+             background-color: var(--primary-color);
+             color: var(--white-bg);
+         }
+        /* Preview styles */
+        .preview-container {
+            max-width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: .25rem;
+            background-color: var(--light-bg);
+        }
+        .preview-container img, .preview-container video, .preview-container embed, .preview-container audio {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: .25rem;
+        }
+        .preview-container embed {
+            height: 70vh; /* Adjust PDF preview height */
+             width: 100%; /* Ensure PDF viewer takes width */
+        }
+         /* Alert Styling */
+         .alert-primary { /* Make primary alerts match theme */
+             color: #004085;
+             background-color: #cce5ff;
+             border-color: #b8daff;
+         }
+         /* Other alert types for contrast */
+         .alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+         .alert-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+         .alert-warning { background-color: #fff3cd; border-color: #ffeeba; color: #856404; }
+         .alert-info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+
+         .breadcrumb { /* Style breadcrumbs if used */
+             background-color: var(--light-bg);
+             padding: .75rem 1rem;
+             margin-bottom: 1.5rem;
+         }
+         .breadcrumb-item a {
+             color: var(--primary-color);
+         }
+         .breadcrumb-item.active {
+             color: #6c757d;
+         }
+
+         /* Custom scrollbar (optional, webkit only) */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: var(--light-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+          background: var(--primary-color);
+          border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #0056b3;
+        }
+
     </style>
   </head>
   <body>
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="{{ url_for('home') }}">ফাইল সার্ভার</a>
+    <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top"> <a class="navbar-brand" href="{{ url_for('home') }}">
+          <i class="fas fa-server"></i> ফাইল সার্ভার
+      </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -34,11 +213,11 @@
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
           {% if g.user %} {# g.user is set by login_required decorator #}
-            <li class="nav-item active">
-              <a class="nav-link" href="{{ url_for('home') }}">হোম <span class="sr-only">(current)</span></a>
+            <li class="nav-item {{ 'active' if request.endpoint == 'home' else '' }}">
+              <a class="nav-link" href="{{ url_for('home') }}"><i class="fas fa-home"></i> হোম <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('trash') }}">ট্র্যাশ</a>
+            <li class="nav-item {{ 'active' if request.endpoint == 'trash' else '' }}">
+              <a class="nav-link" href="{{ url_for('trash') }}"><i class="fas fa-trash-alt"></i> ট্র্যাশ</a>
             </li>
           {% endif %}
         </ul>
@@ -46,20 +225,20 @@
              {% if g.user %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        👤 {{ g.user.name or g.user.email }}
+                        <i class="fas fa-user-circle user-icon"></i> {{ g.user.name or g.user.email }}
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url_for('account') }}">অ্যাকাউন্ট</a>
+                        <a class="dropdown-item" href="{{ url_for('account') }}"><i class="fas fa-cog"></i> অ্যাকাউন্ট</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ url_for('logout') }}">লগ আউট</a>
+                        <a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> লগ আউট</a>
                     </div>
                 </li>
              {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('login') }}">লগইন</a>
+                <li class="nav-item {{ 'active' if request.endpoint == 'login' else '' }}">
+                    <a class="nav-link" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> লগইন</a>
                 </li>
-                <li class="nav-item">
-                     <a class="nav-link" href="{{ url_for('signup') }}">সাইন আপ</a>
+                <li class="nav-item {{ 'active' if request.endpoint == 'signup' else '' }}">
+                     <a class="nav-link" href="{{ url_for('signup') }}"><i class="fas fa-user-plus"></i> সাইন আপ</a>
                 </li>
              {% endif %}
         </ul>
@@ -72,7 +251,9 @@
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-            <div class="alert alert-{{ category or 'info' }} alert-dismissible fade show" role="alert">
+            {# Map category to Bootstrap alert class - default to 'info' if not specified or unknown #}
+            {% set alert_class = category if category in ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'] else 'info' %}
+            <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
               {{ message | safe }} {# Use |safe for HTML in flash messages like share link #}
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -85,9 +266,25 @@
       {# Main content block #}
       {% block content %}{% endblock %}
 
-    </main><script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    </main>
+
+    <footer class="container text-center mt-5 mb-3">
+        <small class="text-muted">&copy; {% block year %}{{ current_year or '2024' }}{% endblock %} আপনার ফাইল সার্ভার। সর্বস্বত্ব সংরক্ষিত।</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
-    {% block scripts %}{% endblock %} {# Optional block for page-specific scripts #}
+
+    {# Optional block for page-specific scripts #}
+    <script>
+    // Add bootstrap custom file input label update behaviour
+    $('.custom-file-input').on('change', function(event) {
+        var inputFile = event.currentTarget;
+        $(inputFile).parent()
+            .find('.custom-file-label')
+            .html(inputFile.files[0].name);
+    });
+    </script>
+    {% block scripts %}{% endblock %}
   </body>
 </html>
-
