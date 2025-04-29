@@ -5,23 +5,24 @@
 
 {% block content %}
   <div class="upload-section shadow-sm mb-4">
-    <h4 class="mb-3 text-primary"><i class="fas fa-cloud-upload-alt"></i> নতুন ফাইল আপলোড করুন</h4>
-    {# Assuming your upload route is named 'upload' #}
-    <form method="post" enctype="multipart/form-data" action="{{ url_for('upload') }}">
+    <h4 class="mb-3 text-primary"><i class="fas fa-cloud-upload-alt mr-2"></i> নতুন ফাইল আপলোড করুন</h4>
+    {# নিশ্চিত করুন 'upload_file' আপনার Flask আপলোড রুটের সঠিক endpoint নাম #}
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('upload_file') }}"> {# <--- এখানেই পরিবর্তন করা হয়েছে #}
         {# Add hidden input for current path if needed #}
         {# <input type="hidden" name="current_path" value="{{ current_path }}"> #}
         <div class="form-group">
              <div class="custom-file">
                  <input type="file" class="custom-file-input" id="customFile" name="file" required>
+                 {# Label টি জাভাস্ক্রিপ্ট দ্বারা আপডেট হবে #}
                  <label class="custom-file-label" for="customFile">ফাইল নির্বাচন করুন...</label>
              </div>
         </div>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> আপলোড করুন</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> আপলোড করুন</button>
     </form>
   </div>
 
   <div class="file-list-section">
-    <h4 class="mb-3 text-primary"><i class="fas fa-folder-open"></i> আপনার ফাইলসমূহ</h4>
+    <h4 class="mb-3 text-primary"><i class="fas fa-folder-open mr-2"></i> আপনার ফাইলসমূহ</h4>
 
     {# Optional: Breadcrumbs for navigation if you have folders #}
     {# Example:
@@ -45,111 +46,126 @@
       <ul class="list-group list-group-flush">
         {# Loop through files/folders passed from the backend #}
         {% for file in files %}
-          <li class="list-group-item">
+          <li class="list-group-item px-0 px-md-2"> {# Reduced padding on small screens #}
               {# Determine icon based on file type (requires logic in backend or complex Jinja) #}
+              {# Ensure 'file' object has 'is_directory' and 'mime_type' attributes #}
               {% set icon_class = 'fa-file-alt' %} {# Default icon #}
-              {% if file.is_directory %} {# Assuming a boolean flag 'is_directory' #}
-                  {% set icon_class = 'fa-folder' %}
-              {% elif file.mime_type.startswith('image/') %} {# Assuming mime_type is available #}
+              {% if file.is_directory %}
+                  {% set icon_class = 'fa-folder text-warning' %} {# Folder with different color #}
+              {% elif file.mime_type and file.mime_type.startswith('image/') %}
                   {% set icon_class = 'fa-file-image' %}
               {% elif file.mime_type == 'application/pdf' %}
-                  {% set icon_class = 'fa-file-pdf' %}
-              {% elif file.mime_type.startswith('audio/') %}
+                  {% set icon_class = 'fa-file-pdf text-danger' %} {# PDF with different color #}
+              {% elif file.mime_type and file.mime_type.startswith('audio/') %}
                    {% set icon_class = 'fa-file-audio' %}
-              {% elif file.mime_type.startswith('video/') %}
+              {% elif file.mime_type and file.mime_type.startswith('video/') %}
                   {% set icon_class = 'fa-file-video' %}
               {% elif file.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %}
-                   {% set icon_class = 'fa-file-word' %}
+                   {% set icon_class = 'fa-file-word text-info' %} {# Word with different color #}
               {% elif file.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
-                   {% set icon_class = 'fa-file-excel' %}
+                   {% set icon_class = 'fa-file-excel text-success' %} {# Excel with different color #}
               {% elif file.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %}
-                   {% set icon_class = 'fa-file-powerpoint' %}
-              {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed'] %}
-                   {% set icon_class = 'fa-file-archive' %}
+                   {% set icon_class = 'fa-file-powerpoint text-warning' %} {# PowerPoint different color #}
+              {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %}
+                   {% set icon_class = 'fa-file-archive text-secondary' %} {# Archive different color #}
               {% endif %}
                <span class="file-icon"><i class="fas {{ icon_class }}"></i></span>
 
                <div class="file-details">
                    {# Link to view/download the file or enter directory #}
+                   {# Replace 'view_or_download' and 'item_id' with your actual endpoint and identifier #}
                    <a href="{{ url_for('view_or_download', item_id=file.id) }}" class="file-name" title="{{ file.name }}">
                        {{ file.name }}
                    </a>
 
                    {# Optional: Display file size and modified date #}
                    <div class="file-meta">
-                       {% if file.size %} {# Only show size if available and not a directory #}
-                         <span class="file-size mr-3">{{ file.size | filesizeformat }}</span> {# Use Flask's filesizeformat or custom filter #}
+                       {# Ensure 'file' object has 'size' and 'modified_date' attributes #}
+                       {# Also ensure you have a 'filesizeformat' filter available #}
+                       {% if file.size and not file.is_directory %}
+                         <span class="file-size mr-3 d-none d-md-inline">{{ file.size | filesizeformat }}</span> {# Hide size on small screens #}
                        {% endif %}
                        {% if file.modified_date %}
-                          <span class="file-date text-muted"><i class="far fa-clock"></i> {{ file.modified_date.strftime('%Y-%m-%d %H:%M') }}</span> {# Format date #}
+                          <span class="file-date text-muted"><i class="far fa-clock mr-1"></i> {{ file.modified_date.strftime('%Y-%m-%d %H:%M') }}</span> {# Format date #}
                        {% endif %}
                    </div>
                </div>
 
                {# Action Buttons Dropdown #}
-               <div class="file-actions ml-3">
+               {# Ensure endpoints 'share_file', 'rename_item', 'move_to_trash' exist #}
+               <div class="file-actions ml-2">
                   <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                      <i class="fas fa-ellipsis-v"></i> <span class="sr-only">অপশন</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-label="File options">
+                      <i class="fas fa-ellipsis-v"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
                       {# Example Actions - adjust urls and logic as needed #}
                       <a class="dropdown-item" href="{{ url_for('view_or_download', item_id=file.id) }}"><i class="fas fa-eye fa-fw mr-2"></i>দেখুন/ডাউনলোড</a>
                       <a class="dropdown-item" href="{{ url_for('share_file', item_id=file.id) }}"><i class="fas fa-share-alt fa-fw mr-2"></i>শেয়ার</a>
+                      {# Rename might need a modal - ensure modal target/id matches #}
                       <a class="dropdown-item" href="#" data-toggle="modal" data-target="#renameModal-{{ file.id }}"><i class="fas fa-edit fa-fw mr-2"></i>নাম পরিবর্তন</a>
                       <div class="dropdown-divider"></div>
-                      <a class="dropdown-item text-danger" href="{{ url_for('move_to_trash', item_id=file.id) }}" onclick="return confirm('আপনি কি নিশ্চিতভাবে এই ফাইলটি ট্র্যাশে সরাতে চান?');"><i class="fas fa-trash-alt fa-fw mr-2"></i>ট্র্যাশে সরান</a>
+                      {# Confirmation added via JS #}
+                      <a class="dropdown-item text-danger" href="{{ url_for('move_to_trash', item_id=file.id) }}" onclick="return confirm('আপনি কি নিশ্চিতভাবে এই আইটেমটি ট্র্যাশে সরাতে চান?');"><i class="fas fa-trash-alt fa-fw mr-2"></i>ট্র্যাশে সরান</a>
                     </div>
                   </div>
                </div>
           </li>
 
-          {# Optional: Rename Modal (Example) - Place outside loop or generate unique IDs #}
-          {#
+          {# Optional: Rename Modal (Example) - Generate unique IDs #}
+          {# Ensure 'rename_item' endpoint exists and handles POST request #}
           <div class="modal fade" id="renameModal-{{ file.id }}" tabindex="-1" aria-labelledby="renameModalLabel-{{ file.id }}" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="renameModalLabel-{{ file.id }}">Rename {{ file.name }}</h5>
+                  <h5 class="modal-title" id="renameModalLabel-{{ file.id }}">"'{{ file.name | truncate(30) }}'" এর নাম পরিবর্তন করুন</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <form action="{{ url_for('rename_item', item_id=file.id) }}" method="post">
                   <div class="modal-body">
-                    <input type="text" class="form-control" name="new_name" value="{{ file.name }}" required>
+                    <div class="form-group">
+                       <label for="newName-{{ file.id }}">নতুন নাম:</label>
+                       <input type="text" class="form-control" id="newName-{{ file.id }}" name="new_name" value="{{ file.name }}" required>
+                    </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Rename</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">বাতিল করুন</button>
+                    <button type="submit" class="btn btn-primary">সংরক্ষণ করুন</button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
-          #}
 
-        {% endfor %}
+        {% endfor %} {# End of file loop #}
       </ul>
     {% else %}
-      <div class="text-center p-5 text-muted">
-          <i class="fas fa-box-open fa-3x mb-3"></i>
-          <p>কোন ফাইল বা ফোল্ডার পাওয়া যায়নি।</p>
+      {# Empty state message #}
+      <div class="text-center p-5 my-4 bg-light rounded">
+          <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
+          <p class="lead text-muted">কোন ফাইল বা ফোল্ডার পাওয়া যায়নি।</p>
           <p>শুরু করতে কিছু ফাইল আপলোড করুন!</p>
       </div>
-    {% endif %}
-  </div>
-{% endblock %}
+    {% endif %} {# End of if files #}
+  </div> {# End of file-list-section #}
+{% endblock %} {# End of content block #}
 
 {% block scripts %}
 {{ super() }} {# Include scripts from base.html if any #}
 <script>
     // Optional: Add any page-specific JavaScript here
-    console.log("Home page scripts loaded.");
+    // console.log("Home page scripts loaded.");
 
-    // Example: Initialize tooltips if you use them
+    // Example: Initialize tooltips if you use them for better UX
     // $(function () {
     //   $('[data-toggle="tooltip"]').tooltip()
     // })
+
+    // Autofocus on rename modal input when shown
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('input[type=text]:first').focus();
+    });
 </script>
-{% endblock %}
+{% endblock %} {# End of scripts block #}
