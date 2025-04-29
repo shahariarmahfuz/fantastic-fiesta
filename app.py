@@ -30,7 +30,7 @@ SECRET_KEY = 'dev_secret_key_please_change_this_in_prod!' # সেশনের �
 DEBUG_MODE = True # প্রোডাকশনে False করুন
 
 # --- Database API Configuration ---
-DATABASE_API_BASE_URL = "https://129d25d8-f171-4dba-b9c4-9fd13a16ed5d-00-3mxoh6j3fplwh.sisko.replit.dev" # আপনার ডেটাবেস সার্ভারের URL
+DATABASE_API_BASE_URL = "https://boka.pythonanywhere.com" # আপনার ডেটাবেস সার্ভারের URL
 # !!! SECURITY WARNING: একটি প্রোডাকশন পরিবেশে, এই সার্ভারগুলির মধ্যে যোগাযোগ সুরক্ষিত করা উচিত (যেমন, API কী বা mTLS) !!!
 logging.warning(f"!!! Using Database API Server at: {DATABASE_API_BASE_URL} !!!")
 logging.warning("!!! SECURITY WARNING: Communication between Photo Server and Database Server might not be secured! Implement API keys or mTLS in production. !!!")
