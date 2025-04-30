@@ -13,42 +13,45 @@
         --text-dark: #343a40;
         --text-muted: #6c757d;
         --hover-bg: #e9ecef;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
         --shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
         --shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
-        --border-radius: .375rem; /* Increased border-radius */
+        --border-radius: .375rem;
     }
 
     body {
-        background-color: var(--light-gray); /* Light background for the page */
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+        background-color: var(--light-gray);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px; /* Slightly smaller base font size */
     }
 
     .container {
-        padding-top: 2rem;
-        padding-bottom: 4rem;
+        padding-top: 1.5rem; /* Reduced padding */
+        padding-bottom: 3rem;
     }
 
     /* --- Action Buttons --- */
     .action-bar {
-        margin-bottom: 2rem;
-        padding: 1rem;
+        margin-bottom: 1.5rem; /* Reduced margin */
+        padding: 0.8rem;
         background-color: #ffffff;
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-sm);
         display: flex;
         flex-wrap: wrap;
-        gap: 0.75rem; /* Gap between buttons */
+        gap: 0.6rem;
         align-items: center;
     }
     .action-icon-btn {
-        font-size: 0.95rem; /* Slightly smaller font size */
-        padding: 0.6rem 1rem;
+        font-size: 0.9rem; /* Adjusted font size */
+        padding: 0.5rem 0.9rem;
         border-radius: var(--border-radius);
         transition: all 0.2s ease-in-out;
     }
     .action-icon-btn i {
-        margin-right: 0.6rem;
-        font-size: 1.1em; /* Relative icon size */
+        margin-right: 0.5rem;
+        font-size: 1.1em;
         vertical-align: middle;
     }
     .action-icon-btn:hover {
@@ -71,31 +74,32 @@
     /* --- Section Headers --- */
     .section-header {
         color: var(--text-dark);
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem;
         font-weight: 600;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 1.3rem;
+        font-size: 1.15rem; /* Adjusted font size */
     }
     .section-header i {
         color: var(--primary-color);
+        font-size: 1.1em;
     }
 
     /* --- General List Styling --- */
     .list-group {
-        border: none; /* Remove default border */
+        border: none;
         border-radius: var(--border-radius);
-        overflow: hidden; /* Ensure children conform to border-radius */
+        overflow: hidden;
         box-shadow: var(--shadow-sm);
     }
     .list-group-item {
-        padding: 1rem 1.25rem;
+        padding: 0.8rem 1rem; /* Reduced padding */
         background-color: #ffffff;
         border: 1px solid var(--border-color);
-        border-width: 0 0 1px 0; /* Bottom border only */
+        border-width: 0 0 1px 0;
         transition: background-color 0.15s ease-in-out;
-        margin-bottom: 0; /* Remove default margin */
+        margin-bottom: 0;
     }
     .list-group-item:first-child {
         border-top-left-radius: var(--border-radius);
@@ -109,139 +113,128 @@
     .list-group-item-action:hover,
     .list-group-item-action:focus {
         background-color: var(--hover-bg);
-        z-index: 1; /* Bring item forward on hover */
+        z-index: 1;
     }
 
     /* --- Folder & File Item Layout --- */
     .item-layout {
         display: flex;
-        align-items: center;
+        align-items: center; /* Align icon and action menu vertically centered */
         width: 100%;
-        gap: 1rem; /* Space between icon and content */
+        gap: 0.8rem; /* Adjusted gap */
     }
     .item-icon-container {
         flex-shrink: 0;
-        font-size: 1.5rem; /* Slightly larger icons */
-        width: 2rem; /* Fixed width for alignment */
+        font-size: 1.4rem; /* Adjusted icon size */
+        width: 1.8rem; /* Adjusted width */
         text-align: center;
+        color: var(--secondary-color); /* Default icon color */
     }
     .item-content {
         flex-grow: 1;
-        min-width: 0; /* Prevent content from overflowing */
+        min-width: 0; /* Crucial for text overflow */
+        padding-right: 5px; /* Space before action button */
     }
+
+    /* Name and Meta layout: Stacked */
     .item-name {
-        display: block;
-        font-weight: 600; /* Bolder name */
+        display: block; /* Ensure block display */
+        font-weight: 500; /* Slightly less bold */
         color: var(--text-dark);
-        margin-bottom: 0.15rem;
-        word-break: break-word;
-        font-size: 1rem;
+        font-size: 0.9rem; /* Adjusted font size */
         text-decoration: none;
         transition: color 0.15s ease;
+
+        /* Text Truncation for long names */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    a.item-name:hover {
+     .item-name:hover {
         color: var(--primary-color);
-        text-decoration: underline;
+        text-decoration: none; /* No underline on hover for cleaner look */
     }
     .item-meta {
-        display: block;
-        font-size: 0.8rem;
+        display: block; /* Ensure block display below name */
+        font-size: 0.75rem; /* Adjusted font size */
         color: var(--text-muted);
         white-space: nowrap;
+        margin-top: 0.15rem; /* Space between name and meta */
     }
     .item-meta i {
         margin-right: 0.3rem;
+        font-size: 0.9em; /* Slightly smaller meta icons */
     }
     .item-actions {
         margin-left: auto;
         flex-shrink: 0;
-        position: relative; /* For dropdown positioning */
+        position: relative;
     }
 
     /* --- Specific Folder Styles --- */
-    .folder-item a.item-name {
-        color: var(--text-dark); /* Keep folder names standard color */
-    }
-    .folder-item a.item-name:hover {
-        color: var(--primary-color); /* Change color on hover */
+    .folder-item .item-content {
+         /* Folders usually don't have meta, align name centrally if needed */
+         display: flex;
+         align-items: center; /* Vertically center folder name if no meta */
     }
     .folder-icon {
-        color: #ffc107; /* Standard folder yellow */
+        color: #ffc107;
     }
 
     /* --- Specific File Styles --- */
-    .file-item .item-icon-container i {
-        color: var(--secondary-color); /* Default file icon color */
-    }
-    /* Color overrides based on type */
     .file-item .item-icon-container .text-danger { color: #dc3545 !important; }
     .file-item .item-icon-container .text-info { color: #17a2b8 !important; }
     .file-item .item-icon-container .text-success { color: #28a745 !important; }
     .file-item .item-icon-container .text-warning { color: #ffc107 !important; }
     .file-item .item-icon-container .text-secondary { color: #6c757d !important; }
-    .file-item .item-icon-container .fa-file-image { color: #a06ee8; } /* Custom color for images */
-    .file-item .item-icon-container .fa-file-audio { color: #fd7e14; } /* Custom color for audio */
-    .file-item .item-icon-container .fa-file-video { color: #e83e8c; } /* Custom color for video */
-
+    .file-item .item-icon-container .fa-file-image { color: #a06ee8; }
+    .file-item .item-icon-container .fa-file-audio { color: #fd7e14; }
+    .file-item .item-icon-container .fa-file-video { color: #e83e8c; }
 
     /* --- File Action Dropdown --- */
     .item-actions .dropdown-toggle {
         background: none;
         border: none;
         color: var(--secondary-color);
-        padding: 0.25rem 0.5rem;
-        font-size: 1.1rem;
+        padding: 0.25rem 0.4rem; /* Adjusted padding */
+        font-size: 1rem; /* Adjusted icon size */
+        line-height: 1; /* Ensure consistent height */
     }
-    .item-actions .dropdown-toggle::after {
-        display: none; /* Hide default caret */
-    }
+    .item-actions .dropdown-toggle::after { display: none; }
     .item-actions .dropdown-toggle:hover,
     .item-actions .dropdown-toggle:focus {
         background-color: var(--hover-bg);
         color: var(--text-dark);
+        border-radius: var(--border-radius); /* Add radius on hover */
     }
     .dropdown-menu {
         border-radius: var(--border-radius);
         box-shadow: var(--shadow);
         border: 1px solid rgba(0,0,0,.08);
-        padding: 0.5rem 0; /* Add padding */
+        padding: 0.4rem 0; /* Adjusted padding */
+        font-size: 0.85rem; /* Smaller font in dropdown */
     }
     .dropdown-item {
-        font-size: 0.9rem;
-        padding: 0.5rem 1.25rem;
+        font-size: inherit; /* Inherit from dropdown-menu */
+        padding: 0.4rem 1rem; /* Adjusted padding */
         color: var(--text-dark);
         display: flex;
         align-items: center;
     }
     .dropdown-item i.fa-fw {
-        margin-right: 0.75rem;
+        margin-right: 0.6rem;
         color: var(--text-muted);
-        width: 1.2em; /* Ensure alignment */
+        width: 1.2em;
         text-align: center;
     }
-    .dropdown-item:hover,
-    .dropdown-item:focus {
-        background-color: var(--hover-bg);
-        color: var(--text-dark);
-    }
-    .dropdown-item:active {
-        background-color: var(--primary-color);
-        color: #fff;
-    }
-     .dropdown-item:active i.fa-fw {
-        color: #fff; /* Ensure icon color changes on active */
-    }
-    .dropdown-divider {
-        margin: 0.5rem 0;
-        border-top: 1px solid var(--border-color);
-    }
-    .dropdown-item form {
-        padding: 0; /* Remove default padding */
-        margin: 0;
-    }
-    .dropdown-item form button {
-        font-size: 0.9rem;
-        padding: 0.5rem 1.25rem; /* Match item padding */
+     .dropdown-item:hover, .dropdown-item:focus { background-color: var(--hover-bg); color: var(--text-dark); }
+     .dropdown-item:active { background-color: var(--primary-color); color: #fff; }
+     .dropdown-item:active i.fa-fw { color: #fff; }
+     .dropdown-divider { margin: 0.4rem 0; border-top: 1px solid var(--border-color); }
+     .dropdown-item form { padding: 0; margin: 0; }
+     .dropdown-item form button {
+        font-size: inherit;
+        padding: 0.4rem 1rem;
         color: var(--text-dark);
         text-align: left !important;
         width: 100%;
@@ -250,217 +243,131 @@
         background: none;
         border: none;
     }
-     .dropdown-item form button:hover,
-     .dropdown-item form button:focus {
-         background-color: var(--hover-bg);
-         color: var(--text-dark);
-     }
-     .dropdown-item form button.text-danger {
-         color: #dc3545 !important;
-     }
-     .dropdown-item form button.text-danger:hover,
-     .dropdown-item form button.text-danger:focus {
-         background-color: #dc3545;
-         color: #fff !important;
-     }
-     .dropdown-item form button.text-danger:hover i.fa-fw,
-     .dropdown-item form button.text-danger:focus i.fa-fw {
-         color: #fff;
-     }
+     .dropdown-item form button:hover, .dropdown-item form button:focus { background-color: var(--hover-bg); color: var(--text-dark); }
+     .dropdown-item form button.text-danger { color: var(--danger-color) !important; }
+     .dropdown-item form button.text-danger:hover, .dropdown-item form button.text-danger:focus { background-color: var(--danger-color); color: #fff !important; }
+     .dropdown-item form button.text-danger:hover i.fa-fw, .dropdown-item form button.text-danger:focus i.fa-fw { color: #fff; }
 
     /* --- Empty State --- */
     .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 150px;
-        padding: 2rem;
-        margin-top: 1rem;
-        background-color: #ffffff; /* White background */
-        border-radius: var(--border-radius);
-        border: 1px dashed var(--border-color); /* Dashed border */
-        text-align: center;
-        color: var(--text-muted);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        min-height: 120px; padding: 1.5rem; margin-top: 1rem;
+        background-color: #ffffff; border-radius: var(--border-radius);
+        border: 1px dashed var(--border-color); text-align: center; color: var(--text-muted);
     }
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        color: var(--secondary-color); /* Muted icon */
-    }
-    .empty-state p {
-        margin-bottom: 0.25rem;
-    }
-    .empty-state .lead {
-        font-size: 1.1rem;
-        font-weight: 300;
-        color: var(--text-dark);
-    }
-    .empty-state .small {
-        font-size: 0.9rem;
-    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 0.8rem; color: var(--secondary-color); }
+    .empty-state p { margin-bottom: 0.25rem; }
+    .empty-state .lead { font-size: 1rem; font-weight: 400; color: var(--text-dark); }
+    .empty-state .small { font-size: 0.85rem; }
 
     /* --- Modal Styles --- */
-    .modal-content {
-        border-radius: var(--border-radius);
-        border: none;
-        box-shadow: var(--shadow);
+    .modal-content { border-radius: var(--border-radius); border: none; box-shadow: var(--shadow); }
+    .modal-header { background-color: var(--light-gray); border-bottom: 1px solid var(--border-color); padding: 0.8rem 1.2rem; }
+    .modal-title { font-weight: 600; font-size: 1.05rem; color: var(--primary-color); display: flex; align-items: center; gap: 0.5rem; }
+    .modal-body { padding: 1.2rem; }
+    .modal-footer { background-color: var(--light-gray); border-top: 1px solid var(--border-color); padding: 0.6rem 1.2rem; }
+    .modal-body .form-group { margin-bottom: 1rem; }
+    .modal-body label { font-weight: 500; margin-bottom: 0.4rem; font-size: 0.85rem; color: var(--text-dark); }
+    .form-control, .custom-select, .custom-file-input, .custom-file-label { border-radius: var(--border-radius); font-size: 0.9rem; border-color: var(--border-color); }
+    .form-control:focus, .custom-select:focus, .custom-file-input:focus ~ .custom-file-label { border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25); }
+    .custom-file-label { background-color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 6rem; }
+    .custom-file-input:lang(en)~.custom-file-label::after { content: "Browse"; border-radius: 0 var(--border-radius) var(--border-radius) 0; background-color: var(--light-gray); border-left: 1px solid var(--border-color); color: var(--text-dark); }
+    .modal-footer .btn { font-size: 0.85rem; padding: 0.4rem 0.8rem; min-width: 70px; }
+    .modal-footer .btn i { margin-right: 0.4rem; }
+
+    /* --- Upload Progress --- */
+    .upload-progress-container {
+        margin-top: 0.8rem;
+        display: none; /* Hidden by default */
     }
-    .modal-header {
-        background-color: var(--light-gray);
-        border-bottom: 1px solid var(--border-color);
-        padding: 1rem 1.5rem;
+    .progress {
+        height: 8px; /* Slightly thicker progress bar */
+        border-radius: 4px;
+        background-color: var(--hover-bg);
+        overflow: hidden; /* Ensure inner bar respects radius */
     }
-    .modal-title {
-        font-weight: 600;
-        font-size: 1.15rem;
-        color: var(--primary-color);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+    .progress-bar {
+        background-color: var(--primary-color);
+        transition: width 0.3s ease-out; /* Smooth progress transition */
+        /* Optional: Add subtle animation */
+        background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
+        background-size: 1rem 1rem;
+        animation: progress-bar-stripes 1s linear infinite;
     }
-    .modal-body {
-        padding: 1.5rem;
+    @keyframes progress-bar-stripes {
+        from { background-position: 1rem 0; }
+        to { background-position: 0 0; }
     }
-    .modal-footer {
-        background-color: var(--light-gray);
-        border-top: 1px solid var(--border-color);
-        padding: 0.75rem 1.5rem;
+    .upload-progress-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-align: right;
+        margin-top: 0.3rem;
     }
-    .modal-body .form-group {
-        margin-bottom: 1.25rem;
-    }
-    .modal-body label {
+    /* Style for upload complete/error messages */
+    .upload-status-message {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
         font-weight: 500;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-        color: var(--text-dark);
     }
-    .form-control, .custom-select, .custom-file-input, .custom-file-label {
-        border-radius: var(--border-radius);
-        font-size: 0.95rem;
-        border-color: var(--border-color);
-    }
-    .form-control:focus, .custom-select:focus, .custom-file-input:focus ~ .custom-file-label {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
-    }
-    .custom-file-label {
-        background-color: #fff;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        padding-right: 6rem; /* Space for the "Browse" text */
-    }
-    .custom-file-input:lang(en)~.custom-file-label::after {
-        content: "Browse"; /* Keep default */
-        border-radius: 0 var(--border-radius) var(--border-radius) 0;
-        background-color: var(--light-gray);
-        border-left: 1px solid var(--border-color);
-        color: var(--text-dark);
-    }
-    .modal-footer .btn {
-        font-size: 0.9rem;
-        padding: 0.5rem 1rem;
-        min-width: 80px; /* Ensure buttons have minimum width */
-    }
-    .modal-footer .btn i {
-        margin-right: 0.4rem;
-    }
+    .upload-status-message.text-success { color: var(--success-color); }
+    .upload-status-message.text-danger { color: var(--danger-color); }
+
 
     /* --- Mobile Responsive Enhancements --- */
     @media (max-width: 768px) {
-        .container {
-            padding-top: 1rem;
-            padding-bottom: 2rem;
-        }
-        .action-bar {
-            padding: 0.75rem;
-            justify-content: center; /* Center buttons on smaller screens */
-        }
-        .action-icon-btn {
-            flex-grow: 1; /* Allow buttons to grow */
-            text-align: center;
-        }
-        .list-group-item {
-            padding: 0.75rem 1rem;
-        }
+        body { font-size: 13px; }
+        .container { padding-top: 1rem; padding-bottom: 2rem; }
+        .action-bar { padding: 0.6rem; justify-content: center; }
+        .action-icon-btn { flex-grow: 1; text-align: center; font-size: 0.85rem; padding: 0.5rem 0.7rem; }
+        .list-group-item { padding: 0.6rem 0.8rem; }
         .item-layout {
-            flex-wrap: wrap; /* Allow wrapping */
-            align-items: flex-start; /* Align items to top when wrapping */
-            gap: 0.5rem; /* Reduce gap */
+            align-items: flex-start; /* Align icon to top */
+            gap: 0.6rem;
+             position: relative; /* Needed for absolute positioning of actions */
+             padding-bottom: 2rem; /* Add padding at bottom to make space for actions */
         }
-        .item-icon-container {
-            font-size: 1.3rem; /* Slightly smaller icons */
-            width: 1.8rem;
-            margin-top: 0.1rem; /* Align icon better with text */
-        }
+        .item-icon-container { font-size: 1.3rem; width: 1.6rem; margin-top: 0; /* Align with first line of text */ }
         .item-content {
-            /* Takes full width below icon */
-            min-width: calc(100% - 2.8rem); /* Account for icon + gap */
+            padding-right: 0; /* No padding needed on mobile */
+             /* Takes full width below icon, adjusted for icon width + gap */
+             width: calc(100% - 1.6rem - 0.6rem);
+             position: static; /* Override any flex positioning */
         }
-        .item-name {
-            font-size: 0.95rem;
-        }
-        .item-meta {
-            font-size: 0.75rem;
-        }
+        .item-name { font-size: 0.85rem; /* Smaller name */ }
+        .item-meta { font-size: 0.7rem; /* Smaller meta */ }
+
+        /* Mobile Action Menu Positioning: Position absolutely at the bottom right */
         .item-actions {
-            margin-left: 0; /* Remove margin */
-            width: 100%; /* Take full width */
-            margin-top: 0.5rem; /* Add space above actions */
-            display: flex;
-            justify-content: flex-end; /* Align dropdown to the right */
-            padding-left: 2.8rem; /* Indent actions to align with content */
-            box-sizing: border-box;
+             position: absolute;
+             bottom: 0.4rem; /* Position near bottom padding */
+             right: 0; /* Align to the right edge of the list item */
+             margin-left: 0;
+             width: auto; /* Let it size based on content */
+             margin-top: 0;
+             padding-left: 0;
         }
-        .item-actions .dropdown-toggle {
-            padding: 0.5rem;
+        .item-actions .dropdown-toggle { padding: 0.4rem; }
+        .dropdown-menu { /* Ensure menu opens correctly */
+             position: absolute !important; /* Override Bootstrap if needed */
+             transform: translate3d(-110px, -10px, 0px) !important; /* Adjust based on testing */
         }
-        .dropdown-menu {
-            /* Position adjustments might be needed depending on context */
-        }
-        .section-header {
-            font-size: 1.2rem;
-            margin-bottom: 0.75rem;
-        }
-        .empty-state {
-            padding: 1.5rem;
-        }
-        .empty-state i {
-            font-size: 2.5rem;
-        }
-        .modal-dialog {
-             margin: 0.5rem; /* Add margin around modal on small screens */
-        }
-        .modal-body {
-            padding: 1rem;
-        }
-        .modal-footer {
-            padding: 0.75rem 1rem;
-        }
-        .modal-body label {
-            font-size: 0.85rem;
-        }
-        .form-control, .custom-select, .custom-file-label {
-            font-size: 0.9rem;
-        }
+
+        .section-header { font-size: 1.1rem; margin-bottom: 0.6rem; }
+        .empty-state { padding: 1.2rem; min-height: 100px; }
+        .empty-state i { font-size: 2.2rem; }
+        .modal-dialog { margin: 0.5rem; }
+        .modal-body { padding: 1rem; }
+        .modal-footer { padding: 0.6rem 1rem; }
+        .modal-body label { font-size: 0.8rem; }
+        .form-control, .custom-select, .custom-file-label { font-size: 0.85rem; }
     }
 
     @media (max-width: 480px) {
-        .action-icon-btn {
-            font-size: 0.9rem;
-            padding: 0.5rem 0.8rem;
-        }
-        .action-icon-btn i {
-             margin-right: 0.4rem;
-        }
-        .item-actions {
-             padding-left: 2.3rem; /* Further adjust indent */
-        }
-        .item-content {
-            min-width: calc(100% - 2.3rem); /* Adjust content width */
-        }
+        .action-icon-btn { font-size: 0.8rem; padding: 0.4rem 0.6rem; }
+        .action-icon-btn i { margin-right: 0.3rem; }
+        .item-layout { padding-bottom: 1.8rem; } /* Adjust space for actions */
+        .item-actions { bottom: 0.3rem; }
     }
 
 </style>
@@ -475,9 +382,10 @@
             <i class="fas fa-folder-plus"></i> Create Folder
         </button>
     </div>
+
     <h4 class="section-header"><i class="fas fa-folder"></i> Folders</h4>
     {% if folders %}
-        <div class="list-group mb-4">
+        <div class="list-group mb-3"> {# Reduced bottom margin #}
             {% for folder in folders %}
                 <a href="{{ url_for('view_folder', folder_id=folder.id) }}" class="list-group-item list-group-item-action">
                     <div class="item-layout folder-item">
@@ -485,14 +393,14 @@
                             <i class="fas fa-folder folder-icon"></i>
                         </div>
                         <div class="item-content">
-                            <span class="item-name">{{ folder.name }}</span>
-                            </div>
+                            <span class="item-name" title="{{ folder.name }}">{{ folder.name }}</span> {# Added title for potential overflow #}
+                        </div>
                         </div>
                 </a>
             {% endfor %}
         </div>
     {% else %}
-        <div class="empty-state">
+        <div class="empty-state mb-3">
             <i class="fas fa-folder-open"></i>
             <p class="lead">No folders here yet.</p>
             <p class="small">Use the 'Create Folder' button above.</p>
@@ -507,7 +415,7 @@
                 <div class="item-layout file-item">
                     <div class="item-icon-container">
                         {% set icon_class = 'fa-file-alt' %}
-                        {% set icon_color = '' %} {# Colors are handled by CSS now #}
+                        {# Color classes are added based on type, CSS targets them #}
                         {% if file.mime_type %}
                             {% if file.mime_type.startswith('image/') %} {% set icon_class = 'fa-file-image' %}
                             {% elif file.mime_type == 'application/pdf' %} {% set icon_class = 'fa-file-pdf text-danger' %}
@@ -519,17 +427,19 @@
                             {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %} {% set icon_class = 'fa-file-archive text-secondary' %}
                             {% endif %}
                         {% endif %}
-                        <i class="fas {{ icon_class }}"></i> {# Removed icon_color class, handled by CSS #}
+                        <i class="fas {{ icon_class }}"></i>
                     </div>
 
                     <div class="item-content">
+                        {# File name - now handles overflow #}
                         <a href="{{ url_for('view_file', file_id=file.id) }}" class="item-name" title="{{ file.original_filename }}">
                             {{ file.original_filename }}
                         </a>
+                        {# Meta info - now below the name #}
                         <span class="item-meta">
                             <i class="far fa-clock"></i> {{ file.upload_time | datetimeformat }}
-                             {% if file.size %} {# Optional: Display file size #}
-                             <span class="mx-1">|</span> <i class="fas fa-hdd"></i> {{ file.size | humansize }} {# Assuming a 'humansize' filter exists #}
+                             {% if file.size %}
+                             <span class="mx-1">|</span> <i class="fas fa-database"></i> {# Changed icon #} {{ file.size | humansize }} {# Requires 'humansize' filter #}
                              {% endif %}
                         </span>
                     </div>
@@ -542,7 +452,7 @@
                                     data-toggle="dropdown"
                                     aria-expanded="false"
                                     title="More actions">
-                                <i class="fas fa-ellipsis-h"></i> {# Horizontal ellipsis looks cleaner #}
+                                <i class="fas fa-ellipsis-v"></i> {# Vertical ellipsis often preferred #}
                             </button>
                             <div class="dropdown-menu dropdown-menu-right"
                                  aria-labelledby="dropdownMenuButton{{ file.id }}">
@@ -561,7 +471,7 @@
                                 <button type="button" class="dropdown-item"
                                         data-toggle="modal"
                                         data-target="#moveModal{{ file.id }}">
-                                    <i class="fas fa-folder-open fa-fw"></i>Move {# Changed icon #}
+                                    <i class="fas fa-folder-open fa-fw"></i>Move
                                 </button>
                                 <div class="dropdown-divider"></div>
                                 <form method="post"
@@ -592,11 +502,10 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <p class="mb-3 text-muted small">
-                                    Move "<strong>{{ file.original_filename }}</strong>" to:
+                                <p class="mb-2 text-muted small">
+                                    Move "<strong>{{ file.original_filename | truncate(30) }}</strong>" to: {# Truncate name in modal too #}
                                 </p>
                                 <div class="form-group mb-0">
-                                    {# Label hidden for cleaner look #}
                                     <select name="target_folder_id" id="target_folder_id{{ file.id }}"
                                             class="form-control custom-select" required>
                                         {% if not folders %}
@@ -623,7 +532,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <div class="empty-state">
+        <div class="empty-state mb-4">
             <i class="fas fa-box-open"></i>
             <p class="lead">No files found here.</p>
             <p class="small">Use the 'Upload File' button to add files.</p>
@@ -631,7 +540,7 @@
     {% endif %}
 
     <div class="modal fade" id="uploadFileModal" tabindex="-1"
-         aria-labelledby="uploadFileModalLabel" aria-hidden="true">
+         aria-labelledby="uploadFileModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false"> {# Prevent closing during upload #}
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" id="uploadForm">
@@ -639,7 +548,7 @@
                         <h5 class="modal-title" id="uploadFileModalLabel">
                             <i class="fas fa-cloud-upload-alt"></i> Upload File
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="uploadModalCloseButton">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -650,8 +559,12 @@
                                 <input type="file" class="custom-file-input" name="file_upload" id="file_upload" required>
                                 <label class="custom-file-label" for="file_upload" data-browse="Browse">Choose file...</label>
                             </div>
-                             <div class="progress mt-2" style="height: 5px; display: none;">
-                               <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                             <div class="upload-progress-container mt-3">
+                                 <div class="progress">
+                                   <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                 </div>
+                                 <div class="upload-progress-text text-right mt-1">0%</div>
+                                 <div class="upload-status-message mt-2"></div> {# For success/error messages #}
                              </div>
                         </div>
                         <div class="form-group mb-0">
@@ -665,8 +578,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="uploadCancelButton">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="uploadSubmitButton">
                             <i class="fas fa-upload"></i> Upload
                         </button>
                     </div>
@@ -712,86 +625,148 @@
 {{ super() }} {# Include scripts from base.html if any #}
 <script>
 $(document).ready(function() {
-    // Update custom file input label with selected file name
-    $('.custom-file-input').on('change', function(event) {
+    // Update custom file input label
+    $('#file_upload').on('change', function(event) {
         var inputFile = event.target;
         var fileName = inputFile.files.length > 0 ? inputFile.files[0].name : 'Choose file...';
-        $(inputFile).next('.custom-file-label').text(fileName); // Use .text() to prevent HTML injection
+        $(inputFile).next('.custom-file-label').text(fileName);
+        // Reset progress/status if a new file is chosen after a previous attempt
+        resetUploadState();
     });
 
-    // Reset upload form when modal is closed
+    // Reset upload form state
+    function resetUploadState() {
+        var modal = $('#uploadFileModal');
+        modal.find('.upload-progress-container').hide();
+        modal.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0).removeClass('bg-success bg-danger').addClass('bg-primary');
+        modal.find('.upload-progress-text').text('0%');
+        modal.find('.upload-status-message').text('').removeClass('text-success text-danger');
+        modal.find('#file_upload').prop('disabled', false);
+        modal.find('#folder_id_modal').prop('disabled', false);
+        modal.find('#uploadSubmitButton').prop('disabled', false).html('<i class="fas fa-upload"></i> Upload');
+        modal.find('#uploadCancelButton').prop('disabled', false);
+        modal.find('#uploadModalCloseButton').prop('disabled', false);
+         // Make modal closable again
+        modal.data('bs.modal')._config.backdrop = true;
+        modal.data('bs.modal')._config.keyboard = true;
+    }
+
+    // Reset forms when modals are closed
     $('#uploadFileModal').on('hidden.bs.modal', function (e) {
         var form = $(this).find('form')[0];
-        if (form) {
-            form.reset();
-        }
-        // Also reset the file input label
+        if (form) form.reset();
         $(this).find('.custom-file-label').text('Choose file...');
-        // Hide progress bar if shown
-        $(this).find('.progress').hide();
-        $(this).find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0);
+        resetUploadState(); // Ensure progress is reset if closed manually
     });
 
-    // Reset create folder form when modal is closed
     $('#createFolderModal').on('hidden.bs.modal', function (e) {
          var form = $(this).find('form')[0];
-         if (form) {
-            form.reset();
-         }
+         if (form) form.reset();
     });
 
-    // Optional: Add submit prevention for empty folder name
-     $('#createFolderForm').on('submit', function(e) {
+    // Prevent empty folder name submission
+    $('#createFolderForm').on('submit', function(e) {
         var folderNameInput = $('#folder_name');
         if (folderNameInput.val().trim() === '') {
             alert('Folder name cannot be empty or just spaces.');
             folderNameInput.focus();
-            e.preventDefault(); // Prevent form submission
+            e.preventDefault();
             return false;
         }
     });
 
-    // Optional: Add AJAX upload with progress (requires server-side support)
-    // $('#uploadForm').on('submit', function(e) {
-    //     e.preventDefault();
-    //     var formData = new FormData(this);
-    //     var progressBar = $(this).find('.progress');
-    //     var progressBarInner = $(this).find('.progress-bar');
+    // AJAX File Upload Logic
+    $('#uploadForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
 
-    //     $.ajax({
-    //         url: $(this).attr('action'),
-    //         type: 'POST',
-    //         data: formData,
-    //         processData: false,
-    //         contentType: false,
-    //         xhr: function() {
-    //             var xhr = new window.XMLHttpRequest();
-    //             progressBar.show();
-    //             xhr.upload.addEventListener('progress', function(evt) {
-    //                 if (evt.lengthComputable) {
-    //                     var percentComplete = Math.round((evt.loaded / evt.total) * 100);
-    //                     progressBarInner.css('width', percentComplete + '%');
-    //                     progressBarInner.attr('aria-valuenow', percentComplete);
-    //                     progressBarInner.text(percentComplete + '%'); // Optional: show text
-    //                 }
-    //             }, false);
-    //             return xhr;
-    //         },
-    //         success: function(data) {
-    //             // Handle success - e.g., close modal, refresh list
-    //             $('#uploadFileModal').modal('hide');
-    //             location.reload(); // Simple refresh
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //             // Handle error
-    //             alert('Upload failed: ' + errorThrown);
-    //             progressBar.hide();
-    //         }
-    //     });
-    // });
+        var form = this;
+        var formData = new FormData(form);
+        var modal = $('#uploadFileModal');
+        var progressBarContainer = modal.find('.upload-progress-container');
+        var progressBar = modal.find('.progress-bar');
+        var progressText = modal.find('.upload-progress-text');
+        var statusMessage = modal.find('.upload-status-message');
+        var submitButton = modal.find('#uploadSubmitButton');
+        var cancelButton = modal.find('#uploadCancelButton');
+        var closeButton = modal.find('#uploadModalCloseButton');
+        var fileInput = modal.find('#file_upload');
+        var folderSelect = modal.find('#folder_id_modal');
 
-    // Enable tooltips if you use them (e.g., on file names or action buttons)
-    // $('[data-toggle="tooltip"]').tooltip(); // Requires Bootstrap's JS for tooltips
+        // Basic check if a file is selected
+        if (!fileInput[0].files || fileInput[0].files.length === 0) {
+            statusMessage.text('Please select a file first.').addClass('text-danger');
+            return;
+        }
+
+        // --- Start Upload ---
+        progressBarContainer.show();
+        statusMessage.text('Uploading...').removeClass('text-success text-danger');
+        submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+        cancelButton.prop('disabled', true); // Disable cancel during upload for simplicity
+        closeButton.prop('disabled', true); // Disable close button
+        fileInput.prop('disabled', true);
+        folderSelect.prop('disabled', true);
+
+        // Prevent closing modal during upload
+        modal.data('bs.modal')._config.backdrop = 'static';
+        modal.data('bs.modal')._config.keyboard = false;
+
+
+        $.ajax({
+            url: $(form).attr('action'), // Get URL from form action
+            type: 'POST',
+            data: formData,
+            processData: false, // Important!
+            contentType: false, // Important!
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                // Upload progress event listener
+                xhr.upload.addEventListener('progress', function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                        progressBar.css('width', percentComplete + '%');
+                        progressBar.attr('aria-valuenow', percentComplete);
+                        progressText.text(percentComplete + '%');
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function(data, textStatus, jqXHR) {
+                // --- Upload Success ---
+                progressBar.addClass('bg-success'); // Green bar on success
+                statusMessage.text('Upload successful!').addClass('text-success').removeClass('text-danger');
+                submitButton.html('<i class="fas fa-check"></i> Done!'); // Indicate success
+                // Optionally close modal after a delay and refresh
+                setTimeout(function() {
+                     modal.modal('hide');
+                     location.reload(); // Refresh page to see the new file
+                }, 1500); // Close after 1.5 seconds
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // --- Upload Error ---
+                progressBar.addClass('bg-danger'); // Red bar on error
+                var errorMessage = 'Upload failed. Please try again.';
+                if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                    errorMessage = 'Upload failed: ' + jqXHR.responseJSON.error;
+                } else if (errorThrown) {
+                     errorMessage = 'Upload failed: ' + errorThrown;
+                }
+                statusMessage.text(errorMessage).addClass('text-danger').removeClass('text-success');
+
+                // Re-enable form elements for another try
+                submitButton.prop('disabled', false).html('<i class="fas fa-upload"></i> Upload');
+                cancelButton.prop('disabled', false);
+                closeButton.prop('disabled', false);
+                fileInput.prop('disabled', false);
+                folderSelect.prop('disabled', false);
+                 // Make modal closable again
+                modal.data('bs.modal')._config.backdrop = true;
+                modal.data('bs.modal')._config.keyboard = true;
+            }
+            // No 'complete' needed as handled by success/error
+        });
+    });
+
 });
 </script>
 {% endblock %}
