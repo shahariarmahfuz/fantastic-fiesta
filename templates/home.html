@@ -5,233 +5,571 @@
 
 {% block head_extra %}
 <style>
-    /* Base styles */
-    .list-group-item {
+    :root {
+        --primary-color: #007bff; /* অথবা আপনার পছন্দের প্রাইমারি রঙ */
+        --secondary-color: #6c757d;
+        --light-gray: #f8f9fa;
+        --border-color: #dee2e6;
+        --text-dark: #343a40;
+        --text-muted: #6c757d;
+        --hover-bg: #e9ecef;
+        --shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
+        --shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+        --border-radius: .375rem; /* Increased border-radius */
+    }
+
+    body {
+        background-color: var(--light-gray); /* Light background for the page */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+    }
+
+    .container {
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+
+    /* --- Action Buttons --- */
+    .action-bar {
+        margin-bottom: 2rem;
         padding: 1rem;
-    }
-    
-    /* File item layout */
-    .file-item {
+        background-color: #ffffff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
         display: flex;
-        align-items: flex-start;
-        width: 100%;
+        flex-wrap: wrap;
+        gap: 0.75rem; /* Gap between buttons */
+        align-items: center;
     }
-    
-    .file-icon-container {
-        margin-right: 1rem;
-        flex-shrink: 0;
+    .action-icon-btn {
+        font-size: 0.95rem; /* Slightly smaller font size */
+        padding: 0.6rem 1rem;
+        border-radius: var(--border-radius);
+        transition: all 0.2s ease-in-out;
     }
-    
-    .file-content {
-        flex-grow: 1;
-        min-width: 0;
+    .action-icon-btn i {
+        margin-right: 0.6rem;
+        font-size: 1.1em; /* Relative icon size */
+        vertical-align: middle;
     }
-    
-    .file-name {
-        display: block;
-        font-weight: bold;
-        color: #212529;
-        margin-bottom: 0.25rem;
-        word-break: break-word;
+    .action-icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
     }
-    
-    .file-meta {
-        display: block;
-        font-size: 0.8rem;
-        color: #6c757d;
+    .btn-primary.action-icon-btn {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
     }
-    
-    .file-actions {
-        margin-left: auto;
-        flex-shrink: 0;
+    .btn-outline-secondary.action-icon-btn {
+        border-color: var(--border-color);
+        color: var(--secondary-color);
     }
-    
-    /* Folder item layout */
-    .folder-item {
+    .btn-outline-secondary.action-icon-btn:hover {
+        background-color: var(--secondary-color);
+        color: #fff;
+    }
+
+    /* --- Section Headers --- */
+    .section-header {
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.3rem;
+    }
+    .section-header i {
+        color: var(--primary-color);
+    }
+
+    /* --- General List Styling --- */
+    .list-group {
+        border: none; /* Remove default border */
+        border-radius: var(--border-radius);
+        overflow: hidden; /* Ensure children conform to border-radius */
+        box-shadow: var(--shadow-sm);
+    }
+    .list-group-item {
+        padding: 1rem 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        border-width: 0 0 1px 0; /* Bottom border only */
+        transition: background-color 0.15s ease-in-out;
+        margin-bottom: 0; /* Remove default margin */
+    }
+    .list-group-item:first-child {
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+    }
+    .list-group-item:last-child {
+        border-bottom: none;
+        border-bottom-left-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+    .list-group-item-action:hover,
+    .list-group-item-action:focus {
+        background-color: var(--hover-bg);
+        z-index: 1; /* Bring item forward on hover */
+    }
+
+    /* --- Folder & File Item Layout --- */
+    .item-layout {
         display: flex;
         align-items: center;
         width: 100%;
+        gap: 1rem; /* Space between icon and content */
     }
-    
-    /* Mobile responsive */
-    @media (max-width: 768px) {
-        .list-group-item {
-            padding: 0.75rem;
-        }
-        
-        .file-item, .folder-item {
-            flex-wrap: wrap;
-        }
-        
-        .file-actions {
-            width: 100%;
-            margin-top: 0.5rem;
-            display: flex;
-            justify-content: flex-end;
-        }
+    .item-icon-container {
+        flex-shrink: 0;
+        font-size: 1.5rem; /* Slightly larger icons */
+        width: 2rem; /* Fixed width for alignment */
+        text-align: center;
     }
-    
-    /* Action buttons */
-    .action-icon-btn {
+    .item-content {
+        flex-grow: 1;
+        min-width: 0; /* Prevent content from overflowing */
+    }
+    .item-name {
+        display: block;
+        font-weight: 600; /* Bolder name */
+        color: var(--text-dark);
+        margin-bottom: 0.15rem;
+        word-break: break-word;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: color 0.15s ease;
+    }
+    a.item-name:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
+    }
+    .item-meta {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+    .item-meta i {
+        margin-right: 0.3rem;
+    }
+    .item-actions {
+        margin-left: auto;
+        flex-shrink: 0;
+        position: relative; /* For dropdown positioning */
+    }
+
+    /* --- Specific Folder Styles --- */
+    .folder-item a.item-name {
+        color: var(--text-dark); /* Keep folder names standard color */
+    }
+    .folder-item a.item-name:hover {
+        color: var(--primary-color); /* Change color on hover */
+    }
+    .folder-icon {
+        color: #ffc107; /* Standard folder yellow */
+    }
+
+    /* --- Specific File Styles --- */
+    .file-item .item-icon-container i {
+        color: var(--secondary-color); /* Default file icon color */
+    }
+    /* Color overrides based on type */
+    .file-item .item-icon-container .text-danger { color: #dc3545 !important; }
+    .file-item .item-icon-container .text-info { color: #17a2b8 !important; }
+    .file-item .item-icon-container .text-success { color: #28a745 !important; }
+    .file-item .item-icon-container .text-warning { color: #ffc107 !important; }
+    .file-item .item-icon-container .text-secondary { color: #6c757d !important; }
+    .file-item .item-icon-container .fa-file-image { color: #a06ee8; } /* Custom color for images */
+    .file-item .item-icon-container .fa-file-audio { color: #fd7e14; } /* Custom color for audio */
+    .file-item .item-icon-container .fa-file-video { color: #e83e8c; } /* Custom color for video */
+
+
+    /* --- File Action Dropdown --- */
+    .item-actions .dropdown-toggle {
+        background: none;
+        border: none;
+        color: var(--secondary-color);
+        padding: 0.25rem 0.5rem;
         font-size: 1.1rem;
-        padding: 0.8rem 1rem;
-        margin: 0 0.25rem;
     }
-    
-    .action-icon-btn i {
-        margin-right: 0.5rem;
+    .item-actions .dropdown-toggle::after {
+        display: none; /* Hide default caret */
     }
-    
-    /* Empty state */
+    .item-actions .dropdown-toggle:hover,
+    .item-actions .dropdown-toggle:focus {
+        background-color: var(--hover-bg);
+        color: var(--text-dark);
+    }
+    .dropdown-menu {
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(0,0,0,.08);
+        padding: 0.5rem 0; /* Add padding */
+    }
+    .dropdown-item {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.25rem;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+    }
+    .dropdown-item i.fa-fw {
+        margin-right: 0.75rem;
+        color: var(--text-muted);
+        width: 1.2em; /* Ensure alignment */
+        text-align: center;
+    }
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+        background-color: var(--hover-bg);
+        color: var(--text-dark);
+    }
+    .dropdown-item:active {
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+     .dropdown-item:active i.fa-fw {
+        color: #fff; /* Ensure icon color changes on active */
+    }
+    .dropdown-divider {
+        margin: 0.5rem 0;
+        border-top: 1px solid var(--border-color);
+    }
+    .dropdown-item form {
+        padding: 0; /* Remove default padding */
+        margin: 0;
+    }
+    .dropdown-item form button {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.25rem; /* Match item padding */
+        color: var(--text-dark);
+        text-align: left !important;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        background: none;
+        border: none;
+    }
+     .dropdown-item form button:hover,
+     .dropdown-item form button:focus {
+         background-color: var(--hover-bg);
+         color: var(--text-dark);
+     }
+     .dropdown-item form button.text-danger {
+         color: #dc3545 !important;
+     }
+     .dropdown-item form button.text-danger:hover,
+     .dropdown-item form button.text-danger:focus {
+         background-color: #dc3545;
+         color: #fff !important;
+     }
+     .dropdown-item form button.text-danger:hover i.fa-fw,
+     .dropdown-item form button.text-danger:focus i.fa-fw {
+         color: #fff;
+     }
+
+    /* --- Empty State --- */
     .empty-state {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         min-height: 150px;
+        padding: 2rem;
+        margin-top: 1rem;
+        background-color: #ffffff; /* White background */
+        border-radius: var(--border-radius);
+        border: 1px dashed var(--border-color); /* Dashed border */
+        text-align: center;
+        color: var(--text-muted);
     }
-    
-    /* Modal styles */
-    .modal-body .form-group {
+    .empty-state i {
+        font-size: 3rem;
         margin-bottom: 1rem;
+        color: var(--secondary-color); /* Muted icon */
     }
-    
-    .custom-file-input ~ .custom-file-label::after {
-        content: "Browse";
+    .empty-state p {
+        margin-bottom: 0.25rem;
     }
-    
+    .empty-state .lead {
+        font-size: 1.1rem;
+        font-weight: 300;
+        color: var(--text-dark);
+    }
+    .empty-state .small {
+        font-size: 0.9rem;
+    }
+
+    /* --- Modal Styles --- */
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--shadow);
+    }
+    .modal-header {
+        background-color: var(--light-gray);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.5rem;
+    }
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.15rem;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .modal-body {
+        padding: 1.5rem;
+    }
+    .modal-footer {
+        background-color: var(--light-gray);
+        border-top: 1px solid var(--border-color);
+        padding: 0.75rem 1.5rem;
+    }
+    .modal-body .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .modal-body label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+    .form-control, .custom-select, .custom-file-input, .custom-file-label {
+        border-radius: var(--border-radius);
+        font-size: 0.95rem;
+        border-color: var(--border-color);
+    }
+    .form-control:focus, .custom-select:focus, .custom-file-input:focus ~ .custom-file-label {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    }
     .custom-file-label {
+        background-color: #fff;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        padding-right: 6rem; /* Space for the "Browse" text */
     }
+    .custom-file-input:lang(en)~.custom-file-label::after {
+        content: "Browse"; /* Keep default */
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        background-color: var(--light-gray);
+        border-left: 1px solid var(--border-color);
+        color: var(--text-dark);
+    }
+    .modal-footer .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        min-width: 80px; /* Ensure buttons have minimum width */
+    }
+    .modal-footer .btn i {
+        margin-right: 0.4rem;
+    }
+
+    /* --- Mobile Responsive Enhancements --- */
+    @media (max-width: 768px) {
+        .container {
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+        }
+        .action-bar {
+            padding: 0.75rem;
+            justify-content: center; /* Center buttons on smaller screens */
+        }
+        .action-icon-btn {
+            flex-grow: 1; /* Allow buttons to grow */
+            text-align: center;
+        }
+        .list-group-item {
+            padding: 0.75rem 1rem;
+        }
+        .item-layout {
+            flex-wrap: wrap; /* Allow wrapping */
+            align-items: flex-start; /* Align items to top when wrapping */
+            gap: 0.5rem; /* Reduce gap */
+        }
+        .item-icon-container {
+            font-size: 1.3rem; /* Slightly smaller icons */
+            width: 1.8rem;
+            margin-top: 0.1rem; /* Align icon better with text */
+        }
+        .item-content {
+            /* Takes full width below icon */
+            min-width: calc(100% - 2.8rem); /* Account for icon + gap */
+        }
+        .item-name {
+            font-size: 0.95rem;
+        }
+        .item-meta {
+            font-size: 0.75rem;
+        }
+        .item-actions {
+            margin-left: 0; /* Remove margin */
+            width: 100%; /* Take full width */
+            margin-top: 0.5rem; /* Add space above actions */
+            display: flex;
+            justify-content: flex-end; /* Align dropdown to the right */
+            padding-left: 2.8rem; /* Indent actions to align with content */
+            box-sizing: border-box;
+        }
+        .item-actions .dropdown-toggle {
+            padding: 0.5rem;
+        }
+        .dropdown-menu {
+            /* Position adjustments might be needed depending on context */
+        }
+        .section-header {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+        }
+        .empty-state {
+            padding: 1.5rem;
+        }
+        .empty-state i {
+            font-size: 2.5rem;
+        }
+        .modal-dialog {
+             margin: 0.5rem; /* Add margin around modal on small screens */
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .modal-footer {
+            padding: 0.75rem 1rem;
+        }
+        .modal-body label {
+            font-size: 0.85rem;
+        }
+        .form-control, .custom-select, .custom-file-label {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .action-icon-btn {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.8rem;
+        }
+        .action-icon-btn i {
+             margin-right: 0.4rem;
+        }
+        .item-actions {
+             padding-left: 2.3rem; /* Further adjust indent */
+        }
+        .item-content {
+            min-width: calc(100% - 2.3rem); /* Adjust content width */
+        }
+    }
+
 </style>
 {% endblock %}
 
 {% block content %}
-    <!-- Action Buttons -->
-    <div class="row mb-4">
-        <div class="col-12 text-center text-md-left">
-            <button type="button" class="btn btn-primary action-icon-btn mb-2 mb-md-0" data-toggle="modal" data-target="#uploadFileModal">
-                <i class="fas fa-cloud-upload-alt"></i> Upload File
-            </button>
-            <button type="button" class="btn btn-outline-secondary action-icon-btn mb-2 mb-md-0" data-toggle="modal" data-target="#createFolderModal">
-                <i class="fas fa-folder-plus"></i> Create Folder
-            </button>
-        </div>
+    <div class="action-bar shadow-sm">
+        <button type="button" class="btn btn-primary action-icon-btn" data-toggle="modal" data-target="#uploadFileModal">
+            <i class="fas fa-cloud-upload-alt"></i> Upload File
+        </button>
+        <button type="button" class="btn btn-outline-secondary action-icon-btn" data-toggle="modal" data-target="#createFolderModal">
+            <i class="fas fa-folder-plus"></i> Create Folder
+        </button>
     </div>
-    <hr class="mb-4">
-
-    <!-- Folders Section -->
-    <h4 class="text-primary mb-3"><i class="fas fa-folder mr-2"></i> Folders</h4>
+    <h4 class="section-header"><i class="fas fa-folder"></i> Folders</h4>
     {% if folders %}
-        <div class="list-group mb-4 shadow-sm">
+        <div class="list-group mb-4">
             {% for folder in folders %}
                 <a href="{{ url_for('view_folder', folder_id=folder.id) }}" class="list-group-item list-group-item-action">
-                    <div class="folder-item">
-                        <div class="file-icon-container">
-                            <i class="fas fa-folder text-warning fa-lg"></i>
+                    <div class="item-layout folder-item">
+                        <div class="item-icon-container">
+                            <i class="fas fa-folder folder-icon"></i>
                         </div>
-                        <div class="file-content">
-                            <span class="file-name">{{ folder.name }}</span>
+                        <div class="item-content">
+                            <span class="item-name">{{ folder.name }}</span>
+                            </div>
                         </div>
-                    </div>
                 </a>
             {% endfor %}
         </div>
     {% else %}
-        <div class="text-center p-4 my-3 bg-light rounded empty-state">
-            <i class="fas fa-folder-open fa-2x mb-3 text-muted"></i>
-            <p class="text-muted mb-0">No folders created yet.</p>
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <p class="lead">No folders here yet.</p>
+            <p class="small">Use the 'Create Folder' button above.</p>
         </div>
     {% endif %}
-    <hr class="mb-4">
 
-    <!-- Files Section -->
+    <h4 class="section-header"><i class="fas fa-file-alt"></i> Files</h4>
     {% if root_files %}
-        <ul class="list-group mb-4 shadow-sm">
+        <ul class="list-group mb-4">
             {% for file in root_files %}
             <li class="list-group-item">
-                <div class="file-item">
-                    <!-- File Icon -->
-                    <div class="file-icon-container">
+                <div class="item-layout file-item">
+                    <div class="item-icon-container">
                         {% set icon_class = 'fa-file-alt' %}
-                        {% set icon_color = '' %}
+                        {% set icon_color = '' %} {# Colors are handled by CSS now #}
                         {% if file.mime_type %}
-                            {% if file.mime_type.startswith('image/') %}
-                                {% set icon_class = 'fa-file-image' %}
-                            {% elif file.mime_type == 'application/pdf' %}
-                                {% set icon_class = 'fa-file-pdf' %}
-                                {% set icon_color = 'text-danger' %}
-                            {% elif file.mime_type.startswith('audio/') %}
-                                {% set icon_class = 'fa-file-audio' %}
-                            {% elif file.mime_type.startswith('video/') %}
-                                {% set icon_class = 'fa-file-video' %}
-                            {% elif file.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %}
-                                {% set icon_class = 'fa-file-word' %}
-                                {% set icon_color = 'text-info' %}
-                            {% elif file.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
-                                {% set icon_class = 'fa-file-excel' %}
-                                {% set icon_color = 'text-success' %}
-                            {% elif file.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %}
-                                {% set icon_class = 'fa-file-powerpoint' %}
-                                {% set icon_color = 'text-warning' %}
-                            {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %}
-                                {% set icon_class = 'fa-file-archive' %}
-                                {% set icon_color = 'text-secondary' %}
+                            {% if file.mime_type.startswith('image/') %} {% set icon_class = 'fa-file-image' %}
+                            {% elif file.mime_type == 'application/pdf' %} {% set icon_class = 'fa-file-pdf text-danger' %}
+                            {% elif file.mime_type.startswith('audio/') %} {% set icon_class = 'fa-file-audio' %}
+                            {% elif file.mime_type.startswith('video/') %} {% set icon_class = 'fa-file-video' %}
+                            {% elif file.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %} {% set icon_class = 'fa-file-word text-info' %}
+                            {% elif file.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %} {% set icon_class = 'fa-file-excel text-success' %}
+                            {% elif file.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %} {% set icon_class = 'fa-file-powerpoint text-warning' %}
+                            {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %} {% set icon_class = 'fa-file-archive text-secondary' %}
                             {% endif %}
                         {% endif %}
-                        <i class="fas {{ icon_class }} {{ icon_color }} fa-lg"></i>
+                        <i class="fas {{ icon_class }}"></i> {# Removed icon_color class, handled by CSS #}
                     </div>
 
-                    <!-- File Details -->
-                    <div class="file-content">
-                        <a href="{{ url_for('view_file', file_id=file.id) }}" class="file-name" title="{{ file.original_filename }}">
+                    <div class="item-content">
+                        <a href="{{ url_for('view_file', file_id=file.id) }}" class="item-name" title="{{ file.original_filename }}">
                             {{ file.original_filename }}
                         </a>
-                        <span class="file-meta">
-                            <i class="far fa-clock mr-1"></i> {{ file.upload_time | datetimeformat }}
+                        <span class="item-meta">
+                            <i class="far fa-clock"></i> {{ file.upload_time | datetimeformat }}
+                             {% if file.size %} {# Optional: Display file size #}
+                             <span class="mx-1">|</span> <i class="fas fa-hdd"></i> {{ file.size | humansize }} {# Assuming a 'humansize' filter exists #}
+                             {% endif %}
                         </span>
                     </div>
 
-                    <!-- File Actions -->
-                    <div class="file-actions">
+                    <div class="item-actions">
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-light text-secondary dropdown-toggle" 
-                                    type="button" 
-                                    id="dropdownMenuButton{{ file.id }}" 
-                                    data-toggle="dropdown" 
-                                    aria-expanded="false">
-                                <i class="fas fa-ellipsis-v"></i>
+                            <button class="btn btn-sm dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton{{ file.id }}"
+                                    data-toggle="dropdown"
+                                    aria-expanded="false"
+                                    title="More actions">
+                                <i class="fas fa-ellipsis-h"></i> {# Horizontal ellipsis looks cleaner #}
                             </button>
-                            <div class="dropdown-menu dropdown-menu-right" 
+                            <div class="dropdown-menu dropdown-menu-right"
                                  aria-labelledby="dropdownMenuButton{{ file.id }}">
                                 <a class="dropdown-item" href="{{ url_for('view_file', file_id=file.id) }}">
-                                    <i class="fas fa-eye fa-fw mr-2"></i>View
+                                    <i class="fas fa-eye fa-fw"></i>View
                                 </a>
                                 <a class="dropdown-item" href="{{ url_for('download_file', file_id=file.id) }}">
-                                    <i class="fas fa-download fa-fw mr-2"></i>Download
+                                    <i class="fas fa-download fa-fw"></i>Download
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <form method="post" 
-                                      action="{{ url_for('create_share_link', file_id=file.id) }}" 
-                                      class="dropdown-item p-0">
-                                    <button type="submit" class="btn btn-link text-decoration-none text-body w-100 text-left pl-3">
-                                        <i class="fas fa-share-alt fa-fw mr-2"></i>Share
+                                <form method="post" action="{{ url_for('create_share_link', file_id=file.id) }}" class="m-0">
+                                    <button type="submit" class="dropdown-item btn btn-link w-100 text-left p-0 border-0">
+                                        <i class="fas fa-share-alt fa-fw"></i>Share
                                     </button>
                                 </form>
-                                <button type="button" class="dropdown-item" 
-                                        data-toggle="modal" 
+                                <button type="button" class="dropdown-item"
+                                        data-toggle="modal"
                                         data-target="#moveModal{{ file.id }}">
-                                    <i class="fas fa-arrows-alt-v fa-fw mr-2"></i>Move
+                                    <i class="fas fa-folder-open fa-fw"></i>Move {# Changed icon #}
                                 </button>
                                 <div class="dropdown-divider"></div>
-                                <form method="post" 
-                                      action="{{ url_for('delete_file', file_id=file.id) }}" 
-                                      class="dropdown-item p-0" 
-                                      onsubmit="return confirm('Are you sure you want to delete this file?');">
-                                    <button type="submit" class="btn btn-link text-danger text-decoration-none w-100 text-left pl-3">
-                                        <i class="fas fa-trash-alt fa-fw mr-2"></i>Delete
+                                <form method="post"
+                                      action="{{ url_for('delete_file', file_id=file.id) }}"
+                                      class="m-0"
+                                      onsubmit="return confirm('Are you sure you want to delete \'{{ file.original_filename }}\'?');">
+                                    <button type="submit" class="dropdown-item btn btn-link w-100 text-left p-0 border-0 text-danger">
+                                        <i class="fas fa-trash-alt fa-fw"></i>Delete
                                     </button>
                                 </form>
                             </div>
@@ -240,32 +578,31 @@
                 </div>
             </li>
 
-            <!-- Move Modal -->
-            <div class="modal fade" id="moveModal{{ file.id }}" tabindex="-1" 
+            <div class="modal fade" id="moveModal{{ file.id }}" tabindex="-1"
                  aria-labelledby="moveModalLabel{{ file.id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content">
                         <form method="post" action="{{ url_for('move_file', file_id=file.id) }}">
                             <div class="modal-header">
-                                <h5 class="modal-title text-primary" id="moveModalLabel{{ file.id }}">
-                                    <i class="fas fa-arrows-alt-v mr-2"></i> Move File
+                                <h5 class="modal-title" id="moveModalLabel{{ file.id }}">
+                                    <i class="fas fa-folder-open"></i> Move File
                                 </h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <p class="mb-2">
-                                    <small>File: <strong>{{ file.original_filename }}</strong></small>
+                                <p class="mb-3 text-muted small">
+                                    Move "<strong>{{ file.original_filename }}</strong>" to:
                                 </p>
                                 <div class="form-group mb-0">
-                                    <label for="target_folder_id{{ file.id }}">Move to folder:</label>
-                                    <select name="target_folder_id" id="target_folder_id{{ file.id }}" 
+                                    {# Label hidden for cleaner look #}
+                                    <select name="target_folder_id" id="target_folder_id{{ file.id }}"
                                             class="form-control custom-select" required>
                                         {% if not folders %}
                                             <option value="" disabled selected>No folders available</option>
                                         {% else %}
-                                            <option value="" disabled selected>-- Select folder --</option>
+                                            <option value="" disabled selected>-- Select a folder --</option>
                                             {% for folder in folders %}
                                                 <option value="{{ folder.id }}">{{ folder.name }}</option>
                                             {% endfor %}
@@ -274,9 +611,9 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary btn-sm" {% if not folders %}disabled{% endif %}>
-                                    <i class="fas fa-check mr-1"></i> Move
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" {% if not folders %}disabled{% endif %}>
+                                    <i class="fas fa-check"></i> Move
                                 </button>
                             </div>
                         </form>
@@ -286,22 +623,21 @@
             {% endfor %}
         </ul>
     {% else %}
-        <div class="text-center p-5 my-4 bg-light rounded empty-state">
-            <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
-            <p class="lead text-muted">No files found here.</p>
-            <p class="text-muted small">Upload files using the button above.</p>
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <p class="lead">No files found here.</p>
+            <p class="small">Use the 'Upload File' button to add files.</p>
         </div>
     {% endif %}
 
-    <!-- Upload File Modal -->
-    <div class="modal fade" id="uploadFileModal" tabindex="-1" 
+    <div class="modal fade" id="uploadFileModal" tabindex="-1"
          aria-labelledby="uploadFileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+                <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" id="uploadForm">
                     <div class="modal-header">
-                        <h5 class="modal-title text-primary" id="uploadFileModalLabel">
-                            <i class="fas fa-cloud-upload-alt mr-2"></i> Upload File
+                        <h5 class="modal-title" id="uploadFileModalLabel">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload File
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -309,11 +645,14 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="file_upload">Select file:</label>
+                            <label for="file_upload">Select file to upload:</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" name="file_upload" id="file_upload" required>
-                                <label class="custom-file-label" for="file_upload">Choose file...</label>
+                                <label class="custom-file-label" for="file_upload" data-browse="Browse">Choose file...</label>
                             </div>
+                             <div class="progress mt-2" style="height: 5px; display: none;">
+                               <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                             </div>
                         </div>
                         <div class="form-group mb-0">
                             <label for="folder_id_modal">Upload to folder:</label>
@@ -326,9 +665,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="fas fa-upload mr-1"></i> Upload
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Upload
                         </button>
                     </div>
                 </form>
@@ -336,15 +675,14 @@
         </div>
     </div>
 
-    <!-- Create Folder Modal -->
-    <div class="modal fade" id="createFolderModal" tabindex="-1" 
+    <div class="modal fade" id="createFolderModal" tabindex="-1"
          aria-labelledby="createFolderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
-                <form method="post" action="{{ url_for('create_folder') }}">
+                <form method="post" action="{{ url_for('create_folder') }}" id="createFolderForm">
                     <div class="modal-header">
-                        <h5 class="modal-title text-primary" id="createFolderModalLabel">
-                            <i class="fas fa-folder-plus mr-2"></i> Create Folder
+                        <h5 class="modal-title" id="createFolderModalLabel">
+                            <i class="fas fa-folder-plus"></i> Create New Folder
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -353,15 +691,15 @@
                     <div class="modal-body">
                         <div class="form-group mb-0">
                             <label for="folder_name">Folder Name:</label>
-                            <input type="text" class="form-control form-control-sm" 
-                                   name="folder_name" id="folder_name" 
-                                   placeholder="Enter folder name" required>
+                            <input type="text" class="form-control"
+                                   name="folder_name" id="folder_name"
+                                   placeholder="Enter folder name" required pattern=".*\S+.*" title="Folder name cannot be empty or just spaces.">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus mr-1"></i> Create
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Create
                         </button>
                     </div>
                 </form>
@@ -371,21 +709,89 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }} {# Include scripts from base.html if any #}
 <script>
+$(document).ready(function() {
     // Update custom file input label with selected file name
     $('.custom-file-input').on('change', function(event) {
         var inputFile = event.target;
-        var fileName = inputFile.files[0].name;
-        $(inputFile).next('.custom-file-label').html(fileName);
+        var fileName = inputFile.files.length > 0 ? inputFile.files[0].name : 'Choose file...';
+        $(inputFile).next('.custom-file-label').text(fileName); // Use .text() to prevent HTML injection
     });
 
-    // Reset forms when modals are closed
+    // Reset upload form when modal is closed
     $('#uploadFileModal').on('hidden.bs.modal', function (e) {
-        $(this).find('.custom-file-label').html('Choose file...');
+        var form = $(this).find('form')[0];
+        if (form) {
+            form.reset();
+        }
+        // Also reset the file input label
+        $(this).find('.custom-file-label').text('Choose file...');
+        // Hide progress bar if shown
+        $(this).find('.progress').hide();
+        $(this).find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0);
     });
-    
+
+    // Reset create folder form when modal is closed
     $('#createFolderModal').on('hidden.bs.modal', function (e) {
-        $(this).find('form')[0].reset();
+         var form = $(this).find('form')[0];
+         if (form) {
+            form.reset();
+         }
     });
+
+    // Optional: Add submit prevention for empty folder name
+     $('#createFolderForm').on('submit', function(e) {
+        var folderNameInput = $('#folder_name');
+        if (folderNameInput.val().trim() === '') {
+            alert('Folder name cannot be empty or just spaces.');
+            folderNameInput.focus();
+            e.preventDefault(); // Prevent form submission
+            return false;
+        }
+    });
+
+    // Optional: Add AJAX upload with progress (requires server-side support)
+    // $('#uploadForm').on('submit', function(e) {
+    //     e.preventDefault();
+    //     var formData = new FormData(this);
+    //     var progressBar = $(this).find('.progress');
+    //     var progressBarInner = $(this).find('.progress-bar');
+
+    //     $.ajax({
+    //         url: $(this).attr('action'),
+    //         type: 'POST',
+    //         data: formData,
+    //         processData: false,
+    //         contentType: false,
+    //         xhr: function() {
+    //             var xhr = new window.XMLHttpRequest();
+    //             progressBar.show();
+    //             xhr.upload.addEventListener('progress', function(evt) {
+    //                 if (evt.lengthComputable) {
+    //                     var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+    //                     progressBarInner.css('width', percentComplete + '%');
+    //                     progressBarInner.attr('aria-valuenow', percentComplete);
+    //                     progressBarInner.text(percentComplete + '%'); // Optional: show text
+    //                 }
+    //             }, false);
+    //             return xhr;
+    //         },
+    //         success: function(data) {
+    //             // Handle success - e.g., close modal, refresh list
+    //             $('#uploadFileModal').modal('hide');
+    //             location.reload(); // Simple refresh
+    //         },
+    //         error: function(jqXHR, textStatus, errorThrown) {
+    //             // Handle error
+    //             alert('Upload failed: ' + errorThrown);
+    //             progressBar.hide();
+    //         }
+    //     });
+    // });
+
+    // Enable tooltips if you use them (e.g., on file names or action buttons)
+    // $('[data-toggle="tooltip"]').tooltip(); // Requires Bootstrap's JS for tooltips
+});
 </script>
 {% endblock %}
