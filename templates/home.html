@@ -1,370 +1,757 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
 
-{% block title %}Home - Premium File Manager{% endblock %}
+{% block title %}Home - ফাইল সার্ভার{% endblock %}
 
 {% block head_extra %}
-<style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <style>
     :root {
-        --primary-color: #4361ee;
-        --secondary-color: #3f37c9;
-        --accent-color: #4895ef;
-        --dark-color: #2b2d42;
-        --light-color: #f8f9fa;
+        --primary-color: #007bff; /* বুটস্ট্র্যাপ প্রাইমারি */
+        --secondary-color: #6c757d; /* বুটস্ট্র্যাপ সেকেন্ডারি */
+        --light-gray: #f8f9fa;
+        --medium-gray: #e9ecef;
+        --dark-gray: #343a40;
+        --border-radius: 0.3rem;
+        --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        --box-shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 
-    .main-container {
-        max-width: 1600px;
-        margin: 0 auto;
-        padding: 2rem 1.5rem;
+    body {
+        background-color: var(--light-gray); /* হালকা ব্যাকগ্রাউন্ড */
     }
 
-    /* Enhanced File List */
-    .file-list-container {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.05);
-        overflow: hidden;
+    /* --- অ্যাকশন বাটন --- */
+    .action-buttons-container {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--medium-gray);
+        margin-bottom: 2rem;
+        background-color: #ffffff;
+        box-shadow: var(--box-shadow);
+        border-radius: var(--border-radius);
+    }
+
+    .action-icon-btn {
+        font-size: 0.95rem; /* সামান্য ছোট ফন্ট সাইজ */
+        padding: 0.6rem 1.2rem; /* প্যাডিং অ্যাডজাস্ট */
+        margin: 0 0.3rem;
+        border-radius: var(--border-radius);
+        transition: all 0.2s ease-in-out; /* স্মুথ ট্রানজিশন */
+    }
+
+    .action-icon-btn i {
+        margin-right: 0.6rem; /* আইকন এবং টেক্সটের মধ্যে স্পেস */
+        font-size: 1.1em; /* আইকন সামান্য বড় */
+        vertical-align: middle; /* আইকন অ্যালাইনমেন্ট */
+    }
+
+    /* --- সেকশন হেডিং --- */
+    .section-heading {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        font-weight: 500; /* মিডিয়াম ফন্ট ওয়েট */
+        display: flex;
+        align-items: center;
+    }
+
+    .section-heading i {
+        margin-right: 0.75rem;
+        font-size: 1.3em;
+    }
+
+    /* --- ফোল্ডার এবং ফাইল লিস্ট --- */
+    .item-list-group {
+        border: none; /* ডিফল্ট বর্ডার রিমুভ */
+        margin-bottom: 2.5rem;
     }
 
     .list-group-item {
-        padding: 1.25rem 1.5rem;
-        border: none;
-        border-bottom: 1px solid #f1f3f5;
-        transition: all 0.2s ease;
+        background-color: #ffffff;
+        border: 1px solid var(--medium-gray); /* সূক্ষ্ম বর্ডার */
+        margin-bottom: 0.75rem; /* আইটেমগুলোর মধ্যে স্পেস */
+        border-radius: var(--border-radius) !important; /* বুটস্ট্র্যাপ ওভাররাইড */
+        padding: 0; /* প্যাডিং কন্টেন্টের ভিতরে দেব */
+        transition: box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
+        overflow: hidden; /* অ্যাকশন মেনুর জন্য */
     }
 
     .list-group-item:hover {
-        background: var(--light-color);
-        transform: translateX(4px);
+        box-shadow: var(--box-shadow-lg);
+        /* transform: translateY(-2px); */ /* হালকা হোভার ইফেক্ট */
+        z-index: 10; /* ড্রপডাউন মেনুর উপরে আসার জন্য */
     }
 
-    /* File Item Layout */
-    .file-item {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        align-items: center;
-        gap: 1.5rem;
+    .list-group-item-action { /* ফোল্ডারের জন্য */
+        display: block; /* সম্পূর্ণ আইটেম ক্লিকেবল */
+        color: inherit; /* ডিফল্ট লিংক কালার ওভাররাইড */
+        text-decoration: none;
     }
+     .list-group-item-action:hover {
+        color: inherit;
+        text-decoration: none;
+     }
 
-    .file-icon-container {
-        width: 42px;
-        height: 42px;
-        border-radius: 8px;
-        background: rgba(var(--primary-color), 0.1);
+
+    /* --- ফোল্ডার আইটেম লেআউট --- */
+    .folder-item-link { /* ফোল্ডারের জন্য এंकर ট্যাগ */
         display: flex;
         align-items: center;
+        padding: 1rem 1.25rem; /* ভেতরের প্যাডিং */
+        text-decoration: none;
+        color: var(--dark-gray);
+        transition: background-color 0.15s ease-in-out;
+    }
+    .folder-item-link:hover {
+        background-color: rgba(0, 123, 255, 0.05); /* হালকা হোভার ব্যাকগ্রাউন্ড */
+        text-decoration: none;
+    }
+
+    .item-icon-container {
+        margin-right: 1rem;
+        flex-shrink: 0;
+        width: 30px; /* নির্দিষ্ট প্রস্থ */
+        text-align: center;
+    }
+
+    .item-icon-container i {
+        font-size: 1.6rem; /* বড় আইকন */
+        vertical-align: middle;
+    }
+
+    .item-content {
+        flex-grow: 1;
+        min-width: 0; /* ফ্লেক্স আইটেমকে সঙ্কুচিত হতে দেয় */
+        display: flex;
+        flex-direction: column;
         justify-content: center;
     }
 
-    .file-icon {
-        font-size: 1.25rem;
+    .item-name {
+        display: block;
+        font-weight: 500; /* মিডিয়াম ওয়েট */
+        color: var(--dark-gray);
+        margin-bottom: 0.1rem;
+        word-break: break-word; /* লম্বা নামের জন্য */
+        font-size: 1rem;
+    }
+    .folder-item-link .item-name {
+        font-weight: 600; /* ফোল্ডারের নাম একটু বোল্ড */
+    }
+
+    .item-meta {
+        display: block;
+        font-size: 0.75rem; /* ছোট মেটা টেক্সট */
+        color: var(--secondary-color);
+    }
+    .item-meta i {
+        margin-right: 0.3rem;
+    }
+
+
+    /* --- ফাইল আইটেম লেআউট --- */
+     .file-item-container {
+        display: flex;
+        align-items: stretch; /* পুরো উচ্চতা জুড়ে থাকবে */
+        padding: 0; /* প্যাডিং ভিতরের অংশে */
+     }
+
+     .file-details-link { /* ফাইলের বিবরণ ও আইকনের অংশ */
+        display: flex;
+        align-items: center;
+        padding: 1rem 0rem 1rem 1.25rem; /* ডানে প্যাডিং কম, অ্যাকশন বাটনের জন্য */
+        flex-grow: 1;
+        min-width: 0;
+        text-decoration: none;
+        color: inherit;
+        transition: background-color 0.15s ease-in-out;
+     }
+     .file-details-link:hover {
+         background-color: rgba(0, 123, 255, 0.05); /* হালকা হোভার ব্যাকগ্রাউন্ড */
+         text-decoration: none;
+         color: inherit;
+     }
+     .file-details-link .item-name {
+         color: var(--primary-color); /* ফাইলের নাম লিংক কালার */
+     }
+     .file-details-link:hover .item-name {
+         text-decoration: underline;
+     }
+
+
+    /* --- ফাইল অ্যাকশনস --- */
+    .item-actions {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        padding-right: 0.5rem; /* ডানদিকে সামান্য প্যাডিং */
+    }
+
+    .action-dropdown .dropdown-toggle {
+        background-color: transparent;
+        border: none;
+        color: var(--secondary-color);
+        padding: 0.75rem 0.75rem; /* ক্লিক করার এরিয়া */
+        font-size: 1rem;
+        line-height: 1;
+    }
+    .action-dropdown .dropdown-toggle::after {
+        display: none; /* ডিফল্ট অ্যারো হাইড */
+    }
+    .action-dropdown .dropdown-toggle:hover,
+    .action-dropdown .dropdown-toggle:focus {
+        background-color: var(--medium-gray);
+        color: var(--dark-gray);
+        box-shadow: none;
+    }
+
+    .action-dropdown .dropdown-menu {
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow-lg);
+        border: 1px solid rgba(0,0,0,0.1);
+        padding: 0.5rem 0; /* উপরে নিচে প্যাডিং */
+    }
+
+    .action-dropdown .dropdown-item {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem; /* আইটেম প্যাডিং */
+        display: flex;
+        align-items: center;
+    }
+     .action-dropdown .dropdown-item i {
+        margin-right: 0.75rem;
+        width: 16px; /* আইকন অ্যালাইনমেন্ট */
+        text-align: center;
+        color: var(--secondary-color);
+     }
+    .action-dropdown .dropdown-item:hover i {
         color: var(--primary-color);
     }
-
-    .file-content {
-        min-width: 0;
+    .action-dropdown .dropdown-item.text-danger i {
+         color: #dc3545; /* ডিলিট আইকনের জন্য */
+    }
+    .action-dropdown .dropdown-item.text-danger:hover i {
+         color: #a71d2a;
     }
 
-    .file-name {
-        font-weight: 600;
-        color: var(--dark-color);
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .file-meta {
-        font-size: 0.85rem;
-        color: #6c757d;
-        display: flex;
-        gap: 1rem;
-        margin-top: 0.25rem;
-    }
-
-    /* Action Buttons */
-    .file-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .action-btn {
-        width: 36px;
-        height: 36px;
+    /* ফর্ম ইন ড্রপডাউন */
+    .dropdown-item-form {
         padding: 0;
+        margin: 0;
+    }
+    .dropdown-item-form .btn-link {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem; /* আইটেম প্যাডিং */
         display: flex;
         align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        transition: all 0.2s ease;
+        width: 100%;
+        text-align: left;
+        color: var(--dark-gray);
+        font-weight: 400;
+        border-radius: 0; /* Ensure no button radius inside dropdown */
     }
-
-    /* Mobile Optimization */
-    @media (max-width: 768px) {
-        .main-container {
-            padding: 1rem;
-        }
-
-        .file-item {
-            grid-template-columns: auto 1fr;
-            gap: 1rem;
-        }
-
-        .file-actions {
-            grid-column: 1 / -1;
-            justify-content: flex-end;
-            padding-top: 0.5rem;
-        }
-
-        .file-meta {
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .file-meta span:last-child {
-            display: none;
-        }
-
-        /* Mobile Action Footer */
-        .mobile-action-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 1rem;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            z-index: 1000;
-        }
+    .dropdown-item-form .btn-link:hover {
+        background-color: var(--light-gray);
+        color: var(--primary-color);
+        text-decoration: none;
     }
+     .dropdown-item-form .btn-link.text-danger {
+        color: #dc3545;
+     }
+     .dropdown-item-form .btn-link.text-danger:hover {
+        color: #a71d2a;
+        background-color: rgba(220, 53, 69, 0.1);
+     }
 
-    /* Empty State */
+    /* --- এম্পটি স্টেট --- */
     .empty-state {
-        padding: 4rem 2rem;
+        background-color: #ffffff;
+        padding: 3rem 1.5rem;
+        border-radius: var(--border-radius);
+        border: 1px dashed var(--medium-gray); /* ড্যাশড বর্ডার */
         text-align: center;
-        background: var(--light-color);
-        border-radius: 12px;
+        margin-bottom: 2rem;
+        color: var(--secondary-color);
     }
 
-    .empty-state-icon {
-        font-size: 3rem;
-        color: #adb5bd;
+    .empty-state i {
+        font-size: 3rem; /* বড় আইকন */
         margin-bottom: 1rem;
+        color: var(--medium-gray); /* হালকা কালার */
     }
 
-    /* Premium Modals */
+    .empty-state .lead {
+        font-size: 1.1rem;
+        color: var(--dark-gray);
+        margin-bottom: 0.5rem;
+    }
+    .empty-state p {
+        font-size: 0.9rem;
+    }
+
+
+    /* --- মডাল স্টাইল --- */
     .modal-content {
+        border-radius: var(--border-radius);
         border: none;
-        border-radius: 12px;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        box-shadow: var(--box-shadow-lg);
     }
-
     .modal-header {
+        background-color: var(--primary-color);
+        color: #ffffff;
         border-bottom: none;
+        padding: 1rem 1.5rem;
+    }
+    .modal-header .modal-title {
+        font-weight: 500;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+    }
+    .modal-header .modal-title i {
+        margin-right: 0.75rem;
+        font-size: 1.2em;
+    }
+    .modal-header .close {
+        color: #ffffff;
+        opacity: 0.8;
+        text-shadow: none;
+        font-size: 1.5rem;
+    }
+    .modal-header .close:hover {
+        opacity: 1;
+    }
+    .modal-body {
         padding: 1.5rem;
     }
-
-    .modal-title {
-        font-weight: 600;
-        color: var(--dark-color);
+    .modal-footer {
+        background-color: var(--light-gray);
+        border-top: 1px solid var(--medium-gray);
+        padding: 0.75rem 1.5rem;
+    }
+    .modal-footer .btn {
+        min-width: 80px; /* বাটনের মিনিমাম প্রস্থ */
     }
 
-    .modal-body {
-        padding: 0 1.5rem 1.5rem;
-    }
-
-    /* Custom File Upload */
+    /* কাস্টম ফাইল ইনপুট */
     .custom-file-label {
+        background-color: #ffffff;
+        border-color: var(--medium-gray);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        border-radius: 8px;
-        padding: 0.75rem;
+        padding-right: 85px; /* 'Browse' বাটনের জন্য জায়গা */
     }
-
+    .custom-file-label::after {
+        content: "Browse";
+        background-color: var(--medium-gray);
+        border-left: 1px solid var(--medium-gray);
+        color: var(--dark-gray);
+        height: calc(100% - 2px);
+        line-height: 1.5;
+        top: 1px;
+        right: 1px;
+        bottom: 1px;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        padding: 0.375rem 0.75rem;
+    }
     .custom-file-input:focus ~ .custom-file-label {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(var(--primary-color), 0.25);
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
 
-    /* Progress Bar */
-    .upload-progress {
-        height: 8px;
-        border-radius: 4px;
-        background: #e9ecef;
-        overflow: hidden;
-        margin-top: 1rem;
+    /* সিলেক্ট ইনপুট */
+    .custom-select {
+        border-color: var(--medium-gray);
+    }
+    .custom-select:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
 
-    .progress-bar {
-        background: var(--primary-color);
-        transition: width 0.3s ease;
+
+    /* --- রেসপন্সিভ ডিজাইন (মোবাইল) --- */
+    @media (max-width: 768px) {
+        .action-buttons-container {
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+        }
+        .action-icon-btn {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            display: block; /* বাটনগুলো নিচে নিচে আসবে */
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .action-icon-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-heading {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* ফাইল/ফোল্ডার আইটেম মোবাইল */
+        .list-group-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .folder-item-link {
+            padding: 0.75rem 1rem;
+        }
+         .file-details-link {
+            padding: 0.75rem 0 0.75rem 1rem;
+         }
+
+        .item-icon-container {
+            margin-right: 0.75rem;
+            width: 25px;
+        }
+        .item-icon-container i {
+            font-size: 1.4rem;
+        }
+        .item-name {
+            font-size: 0.95rem;
+        }
+        .item-meta {
+            font-size: 0.7rem;
+        }
+
+        .item-actions {
+             padding-right: 0.25rem;
+        }
+        .action-dropdown .dropdown-toggle {
+             padding: 0.5rem 0.5rem;
+        }
+
+        .empty-state {
+            padding: 2rem 1rem;
+        }
+        .empty-state i {
+            font-size: 2.5rem;
+        }
+
+        /* মডাল মোবাইল */
+        .modal-dialog {
+            margin: 0.5rem; /* স্ক্রিনের কাছাকাছি */
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .modal-footer {
+            padding: 0.5rem 1rem;
+        }
     }
+
+    /* স্পেসিফিক আইকন কালার */
+    .fa-folder { color: #ffc107; } /* হলুদ */
+    .fa-file-pdf { color: #dc3545; } /* লাল */
+    .fa-file-word { color: #2b579a; } /* ওয়ার্ড নীল */
+    .fa-file-excel { color: #1d6f42; } /* এক্সেল সবুজ */
+    .fa-file-powerpoint { color: #d04423; } /* পাওয়ারপয়েন্ট কমলা */
+    .fa-file-image { color: #6f42c1; } /* বেগুনি */
+    .fa-file-audio { color: #fd7e14; } /* কমলা */
+    .fa-file-video { color: #0dcaf0; } /* সায়ান */
+    .fa-file-archive { color: #6c757d; } /* ধূসর */
+    .fa-file-alt { color: #adb5bd; } /* ডিফল্ট ফাইল আইকন */
+
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="main-container">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-dark">My Files</h1>
-        <div class="d-none d-md-block">
-            <button class="btn btn-primary px-4" data-toggle="modal" data-target="#uploadFileModal">
-                <i class="fas fa-cloud-upload-alt mr-2"></i>Upload
-            </button>
-            <button class="btn btn-outline-secondary px-4" data-toggle="modal" data-target="#createFolderModal">
-                <i class="fas fa-folder-plus mr-2"></i>New Folder
-            </button>
+<div class="container-fluid py-3 py-md-4"> <div class="row">
+        <div class="col-12">
+            <div class="action-buttons-container text-center text-md-left">
+                <button type="button" class="btn btn-primary action-icon-btn" data-toggle="modal" data-target="#uploadFileModal">
+                    <i class="fas fa-cloud-upload-alt"></i> ফাইল আপলোড
+                </button>
+                <button type="button" class="btn btn-outline-secondary action-icon-btn" data-toggle="modal" data-target="#createFolderModal">
+                    <i class="fas fa-folder-plus"></i> ফোল্ডার তৈরি
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Mobile Action Footer -->
-    <div class="mobile-action-footer d-md-none">
-        <button class="btn btn-primary btn-lg shadow" data-toggle="modal" data-target="#uploadFileModal">
-            <i class="fas fa-cloud-upload-alt"></i>
-        </button>
-        <button class="btn btn-outline-secondary btn-lg shadow" data-toggle="modal" data-target="#createFolderModal">
-            <i class="fas fa-folder-plus"></i>
-        </button>
-    </div>
-
-    <!-- Files List -->
-    <div class="file-list-container">
-        {% if folders or root_files %}
-            <div class="list-group list-group-flush">
-                <!-- Folders -->
-                {% for folder in folders %}
-                <a href="{{ url_for('view_folder', folder_id=folder.id) }}" class="list-group-item">
-                    <div class="file-item">
-                        <div class="file-icon-container">
-                            <i class="fas fa-folder text-warning"></i>
+    <h4 class="section-heading"><i class="fas fa-folder text-warning"></i> ফোল্ডারসমূহ</h4>
+    {% if folders %}
+        <div class="list-group item-list-group">
+            {% for folder in folders %}
+                <div class="list-group-item">
+                    <a href="{{ url_for('view_folder', folder_id=folder.id) }}" class="folder-item-link">
+                        <div class="item-icon-container">
+                            <i class="fas fa-folder fa-fw"></i>
                         </div>
-                        <div class="file-content">
-                            <span class="file-name">{{ folder.name }}</span>
-                            <div class="file-meta">
-                                <span>Folder</span>
-                                <span>{{ folder.created_at | datetimeformat }}</span>
+                        <div class="item-content">
+                            <span class="item-name">{{ folder.name }}</span>
+                            </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <p class="lead">এখনও কোন ফোল্ডার তৈরি করা হয়নি।</p>
+            <p>উপরের "ফোল্ডার তৈরি" বাটন ব্যবহার করে নতুন ফোল্ডার যোগ করুন।</p>
+        </div>
+    {% endif %}
+
+    <h4 class="section-heading"><i class="fas fa-file-alt text-secondary"></i> ফাইলসমূহ (রুট)</h4>
+    {% if root_files %}
+        <ul class="list-group item-list-group">
+            {% for file in root_files %}
+            <li class="list-group-item">
+                <div class="file-item-container">
+                    <a href="{{ url_for('view_file', file_id=file.id) }}" class="file-details-link" title="{{ file.original_filename }}">
+                        <div class="item-icon-container">
+                            {% set icon_class = 'fa-file-alt' %}
+                            {% if file.mime_type %}
+                                {% if file.mime_type.startswith('image/') %}
+                                    {% set icon_class = 'fa-file-image' %}
+                                {% elif file.mime_type == 'application/pdf' %}
+                                    {% set icon_class = 'fa-file-pdf' %}
+                                {% elif file.mime_type.startswith('audio/') %}
+                                    {% set icon_class = 'fa-file-audio' %}
+                                {% elif file.mime_type.startswith('video/') %}
+                                    {% set icon_class = 'fa-file-video' %}
+                                {% elif file.mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] %}
+                                    {% set icon_class = 'fa-file-word' %}
+                                {% elif file.mime_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] %}
+                                    {% set icon_class = 'fa-file-excel' %}
+                                {% elif file.mime_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] %}
+                                    {% set icon_class = 'fa-file-powerpoint' %}
+                                {% elif file.mime_type in ['application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed', 'application/gzip', 'application/x-tar'] %}
+                                    {% set icon_class = 'fa-file-archive' %}
+                                {% endif %}
+                            {% endif %}
+                            <i class="fas {{ icon_class }} fa-fw"></i>
+                        </div>
+                        <div class="item-content">
+                            <span class="item-name">{{ file.original_filename }}</span>
+                            <span class="item-meta">
+                                <i class="far fa-clock"></i> {{ file.upload_time | datetimeformat }}
+                                </span>
+                        </div>
+                    </a>
+
+                    <div class="item-actions">
+                        <div class="dropdown action-dropdown">
+                            <button class="btn dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton{{ file.id }}"
+                                    data-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-label="File Actions for {{ file.original_filename }}">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right"
+                                 aria-labelledby="dropdownMenuButton{{ file.id }}">
+                                <a class="dropdown-item" href="{{ url_for('view_file', file_id=file.id) }}">
+                                    <i class="fas fa-eye fa-fw"></i>দেখুন
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('download_file', file_id=file.id) }}">
+                                    <i class="fas fa-download fa-fw"></i>ডাউনলোড
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <form method="post"
+                                      action="{{ url_for('create_share_link', file_id=file.id) }}"
+                                      class="dropdown-item-form m-0">
+                                    <button type="submit" class="btn btn-link">
+                                        <i class="fas fa-share-alt fa-fw"></i>শেয়ার
+                                    </button>
+                                </form>
+                                <button type="button" class="dropdown-item"
+                                        data-toggle="modal"
+                                        data-target="#moveModal{{ file.id }}">
+                                    <i class="fas fa-folder-open fa-fw"></i>সরান (Move)
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <form method="post"
+                                      action="{{ url_for('delete_file', file_id=file.id) }}"
+                                      class="dropdown-item-form m-0"
+                                      onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ফাইলটি মুছে ফেলতে চান?');">
+                                    <button type="submit" class="btn btn-link text-danger">
+                                        <i class="fas fa-trash-alt fa-fw"></i>মুছে ফেলুন
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                </a>
-                {% endfor %}
+                </div> </li>
 
-                <!-- Files -->
-                {% for file in root_files %}
-                <div class="list-group-item">
-                    <div class="file-item">
-                        <div class="file-icon-container">
-                            <i class="{{ file_icon_class(file) }}"></i>
-                        </div>
-                        <div class="file-content">
-                            <a href="{{ url_for('view_file', file_id=file.id) }}" class="file-name">
-                                {{ file.original_filename }}
-                            </a>
-                            <div class="file-meta">
-                                <span>{{ file.file_size | filesizeformat }}</span>
-                                <span>{{ file.upload_time | datetimeformat }}</span>
-                            </div>
-                        </div>
-                        <div class="file-actions">
-                            <div class="dropdown">
-                                <button class="btn action-btn btn-light dropdown-toggle" 
-                                        type="button" data-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v"></i>
+            <div class="modal fade" id="moveModal{{ file.id }}" tabindex="-1"
+                 aria-labelledby="moveModalLabel{{ file.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <form method="post" action="{{ url_for('move_file', file_id=file.id) }}">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="moveModalLabel{{ file.id }}">
+                                    <i class="fas fa-folder-open"></i> ফাইল সরান
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <!-- Dropdown items same as before -->
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-2">
+                                    <small>ফাইল: <strong>{{ file.original_filename }}</strong></small>
+                                </p>
+                                <div class="form-group mb-0">
+                                    <label for="target_folder_id{{ file.id }}">যে ফোল্ডারে সরাবেন:</label>
+                                    <select name="target_folder_id" id="target_folder_id{{ file.id }}"
+                                            class="form-control custom-select custom-select-sm" required>
+                                        {% if not folders %}
+                                            <option value="" disabled selected>কোন ফোল্ডার নেই</option>
+                                        {% else %}
+                                            <option value="" disabled selected>-- ফোল্ডার নির্বাচন করুন --</option>
+                                            {% for folder in folders %}
+                                                <option value="{{ folder.id }}">{{ folder.name }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
                                 </div>
                             </div>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">বাতিল</button>
+                                <button type="submit" class="btn btn-sm btn-primary" {% if not folders %}disabled{% endif %}>
+                                    <i class="fas fa-check mr-1"></i> সরান
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                {% endfor %}
             </div>
-        {% else %}
-            <div class="empty-state">
-                <i class="fas fa-cloud-upload-alt empty-state-icon"></i>
-                <h5 class="mb-3">No Files Found</h5>
-                <p class="text-muted mb-0">Get started by uploading files or creating folders</p>
-            </div>
-        {% endif %}
-    </div>
-</div>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <p class="lead">এখানে কোন ফাইল খুঁজে পাওয়া যায়নি।</p>
+            <p>উপরের "ফাইল আপলোড" বাটন ব্যবহার করে নতুন ফাইল যোগ করুন।</p>
+        </div>
+    {% endif %}
 
-<!-- Modals (keep structure from original but add premium styling) -->
-<div class="modal fade" id="uploadFileModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-cloud-upload-alt mr-2"></i>Upload File</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" name="file_upload" required>
-                            <label class="custom-file-label">Choose file</label>
+</div> <div class="modal fade" id="uploadFileModal" tabindex="-1"
+         aria-labelledby="uploadFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" id="uploadForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadFileModalLabel">
+                            <i class="fas fa-cloud-upload-alt"></i> ফাইল আপলোড করুন
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="file_upload">ফাইল নির্বাচন করুন:</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="file_upload" id="file_upload" required>
+                                <label class="custom-file-label" for="file_upload" data-browse="ব্রাউজ">ফাইল পছন্দ করুন...</label>
+                            </div>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label for="folder_id_modal">যে ফোল্ডারে আপলোড করবেন:</label>
+                            <select name="folder_id" id="folder_id_modal" class="form-control custom-select">
+                                <option value="root">-- মূল ফোল্ডার (Root) --</option>
+                                {% for folder in folders %}
+                                    <option value="{{ folder.id }}">{{ folder.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
-                    <div class="upload-progress d-none">
-                        <div class="progress-bar" style="width: 0%"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">বাতিল</button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-upload mr-1"></i> আপলোড
+                        </button>
                     </div>
-                    <div class="form-group">
-                        <label>Destination Folder</label>
-                        <select name="folder_id" class="form-control">
-                            <option value="root">Main Folder</option>
-                            {% for folder in folders %}
-                            <option value="{{ folder.id }}">{{ folder.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-upload mr-2"></i>Upload File
-                    </button>
                 </form>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Add similar premium styling to other modals -->
+    <div class="modal fade" id="createFolderModal" tabindex="-1"
+         aria-labelledby="createFolderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <form method="post" action="{{ url_for('create_folder') }}" id="createFolderForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createFolderModalLabel">
+                            <i class="fas fa-folder-plus"></i> নতুন ফোল্ডার তৈরি
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group mb-0">
+                            <label for="folder_name">ফোল্ডারের নাম:</label>
+                            <input type="text" class="form-control form-control-sm"
+                                   name="folder_name" id="folder_name"
+                                   placeholder="ফোল্ডারের নাম দিন" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">বাতিল</button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus mr-1"></i> তৈরি করুন
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
+{{ super() }} {# যদি base.html এ স্ক্রিপ্ট ব্লক থাকে #}
 <script>
-    // Enhanced File Upload
-    $('.custom-file-input').on('change', function() {
-        let fileName = $(this).val().split('\\').pop();
-        $(this).next('.custom-file-label').text(fileName);
-    });
+    $(document).ready(function() {
+        // কাস্টম ফাইল ইনপুট লেবেল আপডেট
+        $('.custom-file-input').on('change', function(event) {
+            var inputFile = event.target;
+            var fileName = inputFile.files.length > 0 ? inputFile.files[0].name : 'ফাইল পছন্দ করুন...';
+            $(inputFile).next('.custom-file-label').html(fileName);
+        });
 
-    // Mobile Menu Toggle
-    $('.file-actions .dropdown-toggle').on('click', function(e) {
-        if(window.innerWidth < 768) {
-            $(this).closest('.file-item').toggleClass('show-menu');
-        }
-    });
-
-    // Upload Progress Simulation
-    $('form').on('submit', function() {
-        const progress = $('.upload-progress');
-        progress.removeClass('d-none');
-        let width = 0;
-        const interval = setInterval(() => {
-            width += Math.random() * 20;
-            if(width >= 100) {
-                clearInterval(interval);
-                width = 100;
+        // মডাল বন্ধ হলে ফর্ম রিসেট
+        $('#uploadFileModal').on('hidden.bs.modal', function (e) {
+            var form = $(this).find('form')[0];
+            if (form) {
+                form.reset();
             }
-            $('.progress-bar').css('width', width + '%');
-        }, 300);
+            // ফাইল ইনপুট লেবেল রিসেট
+            $(this).find('.custom-file-label').html('ফাইল পছন্দ করুন...');
+            // সিলেক্ট প্রথম অপশনে রিসেট
+            $(this).find('#folder_id_modal').prop('selectedIndex', 0);
+        });
+
+        $('#createFolderModal').on('hidden.bs.modal', function (e) {
+             var form = $(this).find('form')[0];
+            if (form) {
+                form.reset();
+            }
+        });
+
+        // Optional: Tooltip ইনিশিয়ালাইজেশন (যদি বুটস্ট্র্যাপ JS অন্তর্ভুক্ত থাকে)
+        // $('[data-toggle="tooltip"]').tooltip();
+
+         // Optional: ড্রপডাউনকে list-group-item এর উপরে রাখতে সাহায্য করে
+         $('.action-dropdown').on('show.bs.dropdown', function () {
+            $(this).closest('.list-group-item').css('z-index', 20); // Higher z-index when open
+         });
+
+         $('.action-dropdown').on('hide.bs.dropdown', function () {
+            // Reset z-index after a short delay to allow fade out animation
+            setTimeout(() => {
+                $(this).closest('.list-group-item').css('z-index', '');
+            }, 300);
+         });
+
     });
 </script>
 {% endblock %}
+
